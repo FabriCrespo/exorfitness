@@ -1,0 +1,12 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="exor-blue" x1="7" y1="5" x2="39" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60A5FA"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+  </defs>
+  <path d="M24 2.8 43.2 13.9v20.2L24 45.2 4.8 34.1V13.9L24 2.8Z" stroke="#9AA8B8" stroke-opacity=".55" stroke-width="1.4"/>
+  <path d="M14 15h18M14 24h12M14 33h18" stroke="url(#exor-blue)" stroke-width="3.2" stroke-linecap="square"/>
+  <path d="m28 19 7 5-7 5" stroke="#101827" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <circle cx="36.5" cy="13" r="2" fill="#60A5FA"/>
+</svg>

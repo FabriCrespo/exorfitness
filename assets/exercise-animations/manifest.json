@@ -1,0 +1,343 @@
+{
+  "cell_width": 320,
+  "cell_height": 213,
+  "columns": 4,
+  "states": [
+    {
+      "name": "abductor",
+      "row": 0,
+      "frames": [
+        "abductor_01.png",
+        "abductor_02.png",
+        "abductor_03.png",
+        "abductor_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "bicep-curl",
+      "row": 1,
+      "frames": [
+        "bicep-curl_01.png",
+        "bicep-curl_02.png",
+        "bicep-curl_03.png",
+        "bicep-curl_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "bulgarian-split-squat",
+      "row": 2,
+      "frames": [
+        "bulgarian-split-squat_01.png",
+        "bulgarian-split-squat_02.png",
+        "bulgarian-split-squat_03.png",
+        "bulgarian-split-squat_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "calf-raise",
+      "row": 3,
+      "frames": [
+        "calf-raise_01.png",
+        "calf-raise_02.png",
+        "calf-raise_03.png",
+        "calf-raise_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "chest-press",
+      "row": 4,
+      "frames": [
+        "chest-press_01.png",
+        "chest-press_02.png",
+        "chest-press_03.png",
+        "chest-press_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "chest-supported-row",
+      "row": 5,
+      "frames": [
+        "chest-supported-row_01.png",
+        "chest-supported-row_02.png",
+        "chest-supported-row_03.png",
+        "chest-supported-row_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "dead-bug",
+      "row": 6,
+      "frames": [
+        "dead-bug_01.png",
+        "dead-bug_02.png",
+        "dead-bug_03.png",
+        "dead-bug_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "face-pull",
+      "row": 7,
+      "frames": [
+        "face-pull_01.png",
+        "face-pull_02.png",
+        "face-pull_03.png",
+        "face-pull_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "hammer-curl",
+      "row": 8,
+      "frames": [
+        "hammer-curl_01.png",
+        "hammer-curl_02.png",
+        "hammer-curl_03.png",
+        "hammer-curl_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "hip-thrust",
+      "row": 9,
+      "frames": [
+        "hip-thrust_01.png",
+        "hip-thrust_02.png",
+        "hip-thrust_03.png",
+        "hip-thrust_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "lat-pulldown",
+      "row": 10,
+      "frames": [
+        "lat-pulldown_01.png",
+        "lat-pulldown_02.png",
+        "lat-pulldown_03.png",
+        "lat-pulldown_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "lateral-raise",
+      "row": 11,
+      "frames": [
+        "lateral-raise_01.png",
+        "lateral-raise_02.png",
+        "lateral-raise_03.png",
+        "lateral-raise_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "leg-curl",
+      "row": 12,
+      "frames": [
+        "leg-curl_01.png",
+        "leg-curl_02.png",
+        "leg-curl_03.png",
+        "leg-curl_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "leg-press",
+      "row": 13,
+      "frames": [
+        "leg-press_01.png",
+        "leg-press_02.png",
+        "leg-press_03.png",
+        "leg-press_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "overhead-triceps",
+      "row": 14,
+      "frames": [
+        "overhead-triceps_01.png",
+        "overhead-triceps_02.png",
+        "overhead-triceps_03.png",
+        "overhead-triceps_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "pec-deck",
+      "row": 15,
+      "frames": [
+        "pec-deck_01.png",
+        "pec-deck_02.png",
+        "pec-deck_03.png",
+        "pec-deck_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "romanian-deadlift",
+      "row": 16,
+      "frames": [
+        "romanian-deadlift_01.png",
+        "romanian-deadlift_02.png",
+        "romanian-deadlift_03.png",
+        "romanian-deadlift_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "seated-row",
+      "row": 17,
+      "frames": [
+        "seated-row_01.png",
+        "seated-row_02.png",
+        "seated-row_03.png",
+        "seated-row_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "shoulder-press",
+      "row": 18,
+      "frames": [
+        "shoulder-press_01.png",
+        "shoulder-press_02.png",
+        "shoulder-press_03.png",
+        "shoulder-press_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "stationary-bike",
+      "row": 19,
+      "frames": [
+        "stationary-bike_01.png",
+        "stationary-bike_02.png",
+        "stationary-bike_03.png",
+        "stationary-bike_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    },
+    {
+      "name": "triceps-pushdown",
+      "row": 20,
+      "frames": [
+        "triceps-pushdown_01.png",
+        "triceps-pushdown_02.png",
+        "triceps-pushdown_03.png",
+        "triceps-pushdown_04.png"
+      ],
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ]
+    }
+  ]
+}

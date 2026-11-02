@@ -1,0 +1,373 @@
+{
+  "ok": true,
+  "manifest": "C:\\Users\\sumaj\\OneDrive\\Desktop\\exorFitness\\exorfitness\\assets\\exercise-animations\\manifest.json",
+  "atlas": {
+    "path": "C:\\Users\\sumaj\\OneDrive\\Desktop\\exorFitness\\exorfitness\\public\\exercises\\exercise-animation-atlas.png",
+    "width": 1280,
+    "height": 4473,
+    "columns": 4,
+    "rows": 21,
+    "cell_width": 320,
+    "cell_height": 213
+  },
+  "states": [
+    {
+      "name": "abductor",
+      "row": 0,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        26600,
+        27182,
+        28211,
+        27319
+      ]
+    },
+    {
+      "name": "bicep-curl",
+      "row": 1,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        10020,
+        9508,
+        10265,
+        10226
+      ]
+    },
+    {
+      "name": "bulgarian-split-squat",
+      "row": 2,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        13347,
+        16292,
+        20228,
+        15172
+      ]
+    },
+    {
+      "name": "calf-raise",
+      "row": 3,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        7285,
+        6703,
+        6623,
+        6730
+      ]
+    },
+    {
+      "name": "chest-press",
+      "row": 4,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        29392,
+        31375,
+        30470,
+        29193
+      ]
+    },
+    {
+      "name": "chest-supported-row",
+      "row": 5,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        25679,
+        25343,
+        23876,
+        25237
+      ]
+    },
+    {
+      "name": "dead-bug",
+      "row": 6,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        23450,
+        21289,
+        21160,
+        24098
+      ]
+    },
+    {
+      "name": "face-pull",
+      "row": 7,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        21376,
+        21489,
+        21753,
+        21718
+      ]
+    },
+    {
+      "name": "hammer-curl",
+      "row": 8,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        9845,
+        9535,
+        9509,
+        9704
+      ]
+    },
+    {
+      "name": "hip-thrust",
+      "row": 9,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        31540,
+        28079,
+        28815,
+        29324
+      ]
+    },
+    {
+      "name": "lat-pulldown",
+      "row": 10,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        25945,
+        25679,
+        25926,
+        26790
+      ]
+    },
+    {
+      "name": "lateral-raise",
+      "row": 11,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        9640,
+        10426,
+        10594,
+        10588
+      ]
+    },
+    {
+      "name": "leg-curl",
+      "row": 12,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        30699,
+        31623,
+        36754,
+        33808
+      ]
+    },
+    {
+      "name": "leg-press",
+      "row": 13,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        43402,
+        39822,
+        39988,
+        41638
+      ]
+    },
+    {
+      "name": "overhead-triceps",
+      "row": 14,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        14715,
+        15526,
+        15402,
+        15539
+      ]
+    },
+    {
+      "name": "pec-deck",
+      "row": 15,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        27690,
+        24612,
+        27154,
+        27394
+      ]
+    },
+    {
+      "name": "romanian-deadlift",
+      "row": 16,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        13926,
+        15243,
+        16088,
+        14986
+      ]
+    },
+    {
+      "name": "seated-row",
+      "row": 17,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        32571,
+        32524,
+        34040,
+        34089
+      ]
+    },
+    {
+      "name": "shoulder-press",
+      "row": 18,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        26954,
+        25197,
+        25507,
+        29446
+      ]
+    },
+    {
+      "name": "stationary-bike",
+      "row": 19,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        18065,
+        17430,
+        17907,
+        17842
+      ]
+    },
+    {
+      "name": "triceps-pushdown",
+      "row": 20,
+      "frame_count": 4,
+      "durations_ms": [
+        300,
+        180,
+        300,
+        180
+      ],
+      "nontransparent_pixels": [
+        15857,
+        15780,
+        15956,
+        15992
+      ]
+    }
+  ],
+  "gif": true
+}
