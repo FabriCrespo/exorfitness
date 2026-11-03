@@ -52,7 +52,6 @@ export default function Home() {
             onCancel={workout.cancelWorkout}
             onUpdateSet={workout.updateSet}
             onAddSet={workout.addSet}
-            onAdjustWeight={workout.adjustPendingWeight}
             onSetNotes={workout.setNotes}
             onCompleteExercise={workout.completeExercise}
           />

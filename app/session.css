@@ -1,0 +1,24 @@
+/* ===== Arranque de sesión, barra de progreso y descanso ===== */
+.session-intro { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; justify-items: center; gap: var(--space-2); padding: var(--space-6); background: var(--ground); text-align: center; animation: intro-in .35s ease-out both; }
+.session-intro > * { margin: 0; }
+.intro-kanji { color: var(--accent); font-family: var(--font-display); font-size: 88px; line-height: 1; letter-spacing: .05em; opacity: .9; }
+.intro-label { color: var(--quiet); font-size: 10px; letter-spacing: .4em; }
+.session-intro h2 { margin-top: var(--space-3); font-size: 22px; }
+.intro-summary { color: var(--muted); font-size: 13px; }
+.intro-count { margin-top: var(--space-5); color: var(--accent-bright); font-family: var(--font-display); font-size: 56px; font-weight: 500; line-height: 1; animation: count-pop .9s ease-out both; }
+.session-intro .text-button { margin-top: var(--space-4); }
+@keyframes intro-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes count-pop { 0% { opacity: 0; transform: scale(.6); } 25% { opacity: 1; transform: scale(1.08); } 100% { opacity: .85; transform: scale(1); } }
+
+.session-bar { height: 3px; margin-top: calc(var(--space-2) * -1); border-radius: 99px; background: var(--fill); overflow: hidden; }
+.session-bar span { display: block; height: 100%; border-radius: 99px; background: var(--accent); transition: width .4s ease; }
+
+.rest-timer { display: grid; grid-template-columns: 84px 1fr; align-items: center; gap: var(--space-4); padding: var(--space-4); border: 1px solid var(--edge); border-radius: 16px; background: var(--surface); }
+.rest-timer svg { width: 84px; height: 84px; }
+.rest-copy { display: grid; gap: 2px; }
+.rest-copy > * { margin: 0; }
+.rest-copy strong { font-family: var(--font-display); font-size: 30px; font-weight: 500; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.rest-copy p:last-child { color: var(--muted); font-size: 12px; }
+.rest-actions { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; gap: var(--space-3); }
+
+@media (prefers-reduced-motion: reduce) { .intro-count, .session-intro { animation: none !important; } }

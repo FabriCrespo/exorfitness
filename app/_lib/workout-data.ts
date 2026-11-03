@@ -61,6 +61,16 @@ export function makeDays(): RoutineDay[] {
   ];
 }
 
+/** Kanji y etiqueta del foco de cada día (lunes a sábado), para el banner de la rutina. */
+export const DAY_ACCENTS = [
+  { kanji: "臀", label: "GLUTES" },
+  { kanji: "背中", label: "BACK" },
+  { kanji: "胸", label: "CHEST" },
+  { kanji: "脚", label: "LEGS" },
+  { kanji: "背", label: "BACK" },
+  { kanji: "心肺", label: "CARDIO" },
+];
+
 export const PROFILE = { name: "Fabricio", phase: "Rebuild" };
 
 /** Minutos aproximados de una rutina: 5 de calentamiento más ~2,5 por serie, redondeado a 5. */

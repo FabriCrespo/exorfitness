@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { ActiveExercise, AppData, SetEntry } from "../_lib/types";
 import type { WorkoutStats } from "../_lib/workout-stats";
-import { estimateMinutes, formatNumber } from "../_lib/workout-data";
-import ExerciseDetail from "./ExerciseDetail";
+import { DAY_ACCENTS, estimateMinutes, formatNumber } from "../_lib/workout-data";
 import RoutineExerciseRow from "./RoutineExerciseRow";
+import SessionIntro from "./SessionIntro";
 import ScreenHeader from "./ScreenHeader";
+import WorkoutPlayer from "./WorkoutPlayer";
 
 type Props = {
   data: AppData;
@@ -19,7 +20,6 @@ type Props = {
   onCancel: () => void;
   onUpdateSet: (exerciseId: string, setId: string, patch: Partial<SetEntry>) => void;
   onAddSet: (exerciseId: string) => void;
-  onAdjustWeight: (exerciseId: string, delta: number) => void;
   onSetNotes: (exerciseId: string, notes: string) => void;
   onCompleteExercise: (exerciseId: string) => void;
 };
@@ -27,41 +27,93 @@ type Props = {
 const isExerciseDone = (exercise?: ActiveExercise) =>
   Boolean(exercise && (exercise.done || (exercise.sets.length > 0 && exercise.sets.every((set) => set.complete))));
 
-export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onAdjustWeight, onSetNotes, onCompleteExercise }: Props) {
+export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onSetNotes, onCompleteExercise }: Props) {
   const { selectedDay, activeSession, isCardioDay, newestFirst } = stats;
-  const [openId, setOpenId] = useState<string | null>(null);
+  const exercises = selectedDay.exercises;
+  const total = exercises.length;
+
+  // Si ya hay una sesión en curso (por ejemplo al volver a abrir la app), retoma en el primer ejercicio pendiente.
+  const [showIntro, setShowIntro] = useState(false);
+  const endIntro = useCallback(() => setShowIntro(false), []);
+  const [openId, setOpenId] = useState<string | null>(() =>
+    activeSession ? exercises.find((exercise) => !isExerciseDone(activeSession.exercises.find((item) => item.exerciseId === exercise.id)))?.id ?? null : null,
+  );
 
   const lastLogged = (exerciseId: string) => {
     const workout = newestFirst.find((session) => session.exercises.some((exercise) => exercise.exerciseId === exerciseId));
     return { workout, exercise: workout?.exercises.find((item) => item.exerciseId === exerciseId) };
   };
 
-  const openDefinition = activeSession && openId ? selectedDay.exercises.find((exercise) => exercise.id === openId) : undefined;
+  /** Abre el siguiente ejercicio sin terminar; si no queda ninguno, vuelve a la lista para cerrar la sesión. */
+  const goToNextAfter = (exerciseId: string) => {
+    const start = exercises.findIndex((exercise) => exercise.id === exerciseId);
+    const ordered = [...exercises.slice(start + 1), ...exercises.slice(0, start)];
+    const next = ordered.find((exercise) => !isExerciseDone(activeSession?.exercises.find((item) => item.exerciseId === exercise.id)));
+    setOpenId(next?.id ?? null);
+  };
+
+  const saveSet = (exerciseId: string, setId: string) => {
+    onUpdateSet(exerciseId, setId, { complete: true });
+    navigator.vibrate?.(12);
+    const active = activeSession?.exercises.find((item) => item.exerciseId === exerciseId);
+    const pending = active?.sets.filter((set) => !set.complete && set.id !== setId).length ?? 0;
+    if (pending === 0) {
+      onCompleteExercise(exerciseId);
+      goToNextAfter(exerciseId);
+    }
+  };
+
+  const start = () => {
+    onStart();
+    setOpenId(exercises[0]?.id ?? null);
+    setShowIntro(true);
+  };
+
+  const openDefinition = activeSession && openId ? exercises.find((exercise) => exercise.id === openId) : undefined;
   const openActive = activeSession?.exercises.find((exercise) => exercise.exerciseId === openId);
 
-  if (openDefinition && openActive) {
+  if (activeSession && openDefinition && openActive) {
     const { workout, exercise } = lastLogged(openDefinition.id);
+    const position = exercises.findIndex((item) => item.id === openDefinition.id);
+    const othersPending = exercises.some((item) => item.id !== openDefinition.id && !isExerciseDone(activeSession?.exercises.find((entry) => entry.exerciseId === item.id)));
+    const accentForIntro = DAY_ACCENTS[data.selectedDay] ?? DAY_ACCENTS[0];
     return (
-      <ExerciseDetail
+      <>
+        {showIntro && (
+          <SessionIntro
+            kanji={accentForIntro.kanji}
+            label={accentForIntro.label}
+            focus={selectedDay.focus}
+            summary={`${total} ${total === 1 ? "ejercicio" : "ejercicios"} · ~${estimateMinutes(selectedDay)} min`}
+            onDone={endIntro}
+          />
+        )}
+      <WorkoutPlayer
         key={openDefinition.id}
         exercise={openDefinition}
         activeExercise={openActive}
+        index={position}
+        total={total}
+        isLastExercise={!othersPending}
+        startedAt={activeSession.startedAt}
+        doneCount={activeSession.exercises.filter(isExerciseDone).length}
         previous={exercise}
         previousWorkout={workout}
         sessions={data.sessions}
         onBack={() => setOpenId(null)}
         onUpdateSet={(setId, patch) => onUpdateSet(openDefinition.id, setId, patch)}
+        onSaveSet={(setId) => saveSet(openDefinition.id, setId)}
         onAddSet={() => onAddSet(openDefinition.id)}
-        onAdjustWeight={(delta) => onAdjustWeight(openDefinition.id, delta)}
         onSetNotes={(notes) => onSetNotes(openDefinition.id, notes)}
-        onComplete={() => { onCompleteExercise(openDefinition.id); setOpenId(null); }}
+        onNext={() => { onCompleteExercise(openDefinition.id); goToNextAfter(openDefinition.id); }}
         onRemove={() => { onRemoveExercise(openDefinition.id); setOpenId(null); }}
       />
+      </>
     );
   }
 
+  const accent = DAY_ACCENTS[data.selectedDay] ?? DAY_ACCENTS[0];
   const doneCount = activeSession ? activeSession.exercises.filter(isExerciseDone).length : 0;
-  const total = selectedDay.exercises.length;
 
   return (
     <article className="page-content routine-screen" aria-labelledby="page-title">
@@ -79,26 +131,24 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
         }
       />
 
-      <section className="day-banner" aria-label={selectedDay.focus}>
-        <p className="date-line">{selectedDay.label.toUpperCase()}</p>
-        <h2>{selectedDay.focus}</h2>
-        <p>{total} {total === 1 ? "ejercicio" : "ejercicios"} · ~{estimateMinutes(selectedDay)} min{activeSession && ` · ${doneCount}/${total} hechos`}</p>
+      <section className="day-banner has-sun has-waves" aria-label={selectedDay.focus}>
+        <p className="day-kanji" aria-hidden="true"><b>{accent.kanji}</b><small>{accent.label}</small></p>
+        <div className="day-banner-copy">
+          <h2>{selectedDay.focus}</h2>
+          <p>{total} {total === 1 ? "ejercicio" : "ejercicios"} · ~{estimateMinutes(selectedDay)} min{activeSession && ` · ${doneCount} de ${total} hechos`}</p>
+        </div>
       </section>
 
       {total === 0 ? (
         <p className="empty-state">Este día aún no tiene ejercicios.</p>
       ) : (
-        <ol className="routine-list">
-          {selectedDay.exercises.map((exercise, index) => {
+        <ol className="grouped-list routine-list">
+          {exercises.map((exercise, index) => {
             const active = activeSession?.exercises.find((item) => item.exerciseId === exercise.id);
             const status = activeSession && active ? (isExerciseDone(active) ? "done" : "pending") : null;
             return <RoutineExerciseRow key={`${exercise.id}-${index}`} exercise={exercise} index={index} status={status} onOpen={() => setOpenId(exercise.id)} />;
           })}
         </ol>
-      )}
-
-      {!activeSession && total > 0 && !isCardioDay && !data.sessions.length && (
-        <p className="reference-caption">Usa las series y repeticiones como guía. Ajusta el peso a cómo te sientes hoy y deja 2–3 repeticiones en reserva.</p>
       )}
 
       <footer className="action-bar">
@@ -111,7 +161,7 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
             <button className="primary-button" disabled={stats.completedSets === 0} onClick={onFinish}>Terminar sesión</button>
           </>
         ) : (
-          <button className="primary-button" disabled={total === 0} onClick={onStart}>▶ Iniciar entrenamiento</button>
+          <button className="primary-button" disabled={total === 0} onClick={start}>Iniciar entrenamiento</button>
         )}
       </footer>
     </article>

@@ -40,7 +40,7 @@ export default function ExerciseProgressPanel({ sessions, days }: Props) {
         <option value="maxWeight">Peso máximo</option><option value="volume">Volumen</option><option value="maxReps">Repeticiones máximas</option>
       </select></label>
     </div>
-    {selected ? <ExerciseTrendChart sessions={sessions} exerciseId={exerciseId} metric={metric} /> : <p className="exercise-trend-empty">Cuando guardes series, aparecerá aquí tu historial por ejercicio.</p>}
+    {selected ? <ExerciseTrendChart sessions={sessions} exerciseId={exerciseId} metric={metric} /> : <p className="empty-state">Cuando guardes series, aparecerá aquí tu historial por ejercicio.</p>}
   </section>;
 }
 

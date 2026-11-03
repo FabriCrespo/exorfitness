@@ -12,9 +12,9 @@ type Props = {
 
 function greeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return "Buenos días";
-  if (hour < 19) return "Buenas tardes";
-  return "Buenas noches";
+  if (hour < 12) return "おはよう";
+  if (hour < 19) return "こんにちは";
+  return "こんばんは";
 }
 
 export default function HomeScreen({ data, stats, onSelectDay, onOpenRoutine }: Props) {
@@ -24,7 +24,7 @@ export default function HomeScreen({ data, stats, onSelectDay, onOpenRoutine }: 
 
   return (
     <article className="page-content home-screen" aria-labelledby="page-title">
-      <header className="home-hero">
+      <header className="home-hero has-sun has-waves">
         <p>{greeting()},</p>
         <h1 id="page-title">{PROFILE.name}</h1>
         <p className="home-hero-meta">Semana {stats.weekNumber} · {PROFILE.phase}</p>
@@ -39,6 +39,7 @@ export default function HomeScreen({ data, stats, onSelectDay, onOpenRoutine }: 
       </section>
 
       <button className="today-card" onClick={onOpenRoutine}>
+        <svg className="today-card-mountain" viewBox="0 0 200 80" aria-hidden="true"><path d="M0 80 70 26l14 10 20-24 14 18 18-10 64 60z" fill="currentColor" opacity=".22" /><circle cx="150" cy="22" r="9" fill="currentColor" opacity=".3" /></svg>
         <span className="today-card-label">{hasActiveSession ? "SESIÓN EN CURSO" : isToday ? "HOY TOCA" : selectedDay.label.toUpperCase()}</span>
         <strong>{selectedDay.focus}</strong>
         <span className="today-card-meta">

@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Zen_Maru_Gothic } from "next/font/google";
+import { Shippori_Mincho, Zen_Maru_Gothic } from "next/font/google";
 import "./globals.css";
 import "./theme.css";
 import "./screens.css";
+import "./session.css";
 import RegisterServiceWorker from "./_components/RegisterServiceWorker";
 
-const body = Zen_Maru_Gothic({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-body-jp", display: "swap" });
+const body = Zen_Maru_Gothic({ subsets: ["latin"], weight: ["300", "400", "500"], variable: "--font-body-jp", display: "swap" });
+const display = Shippori_Mincho({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-display-jp", display: "swap" });
 
 export const metadata: Metadata = {
   title: "ExorFitness | Tu libreta de entrenamiento",
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1017",
+  themeColor: "#0a0908",
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,
@@ -25,7 +27,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" data-theme="dark" className={`h-full antialiased ${body.variable}`}>
+    <html lang="es" data-theme="dark" className={`h-full antialiased ${body.variable} ${display.variable}`}>
       <body className="min-h-full flex flex-col">{children}<RegisterServiceWorker /></body>
     </html>
   );

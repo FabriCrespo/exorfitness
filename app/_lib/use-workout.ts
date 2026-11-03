@@ -172,16 +172,6 @@ export function useWorkout() {
       exercises: session.exercises.map((exercise) => (exercise.exerciseId === exerciseId ? { ...exercise, notes } : exercise)),
     }));
 
-  /** Suma o resta peso a las series que todavía no se han guardado. */
-  const adjustPendingWeight = (exerciseId: string, delta: number) =>
-    withActiveSession((session) => ({
-      ...session,
-      exercises: session.exercises.map((exercise) => exercise.exerciseId !== exerciseId ? exercise : {
-        ...exercise,
-        sets: exercise.sets.map((set) => set.complete ? set : { ...set, weightKg: String(Math.max(0, (Number(set.weightKg) || 0) + delta)) }),
-      }),
-    }));
-
   /** Guarda las series que ya tienen peso y repeticiones, y marca el ejercicio como hecho. */
   const completeExercise = (exerciseId: string) =>
     withActiveSession((session) => ({
@@ -263,7 +253,7 @@ export function useWorkout() {
   return {
     data, theme, hydrated, weekStart, storageMessage,
     toggleTheme, selectDay, addExercise, removeExercise,
-    startWorkout, updateSet, addSet, setNotes, adjustPendingWeight, completeExercise, finishWorkout, cancelWorkout,
+    startWorkout, updateSet, addSet, setNotes, completeExercise, finishWorkout, cancelWorkout,
     addMeasurement, exportData, importData,
   };
 }

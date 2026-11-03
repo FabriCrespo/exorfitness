@@ -1,13 +1,12 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { type FormEvent, useMemo, useState } from "react";
 import type { AppData, Measurement } from "../_lib/types";
 import type { WorkoutStats } from "../_lib/workout-stats";
 import { formatDate, formatNumber } from "../_lib/workout-data";
+import ActivityRings from "./ActivityRings";
 import ExerciseProgressPanel from "./ExerciseProgressPanel";
-
-const ProgressScene3D = dynamic(() => import("./ProgressScene3D"), { ssr: false, loading: () => <div className="progress-3d" /> });
+import VolumeChart from "./VolumeChart";
 
 type Props = {
   data: AppData;
@@ -68,7 +67,10 @@ export default function ProgressScreen({ data, stats, onAddMeasurement }: Props)
         <hgroup><p className="date-line">TUS REGISTROS</p><h1 id="page-title">Progreso</h1></hgroup>
       </header>
 
-      <ProgressScene3D done={stats.fixedDaysDone} total={stats.trainingDayCount} volumes={volumes.map((session) => session.volume)} />
+      <section className="card" aria-labelledby="rings-title">
+        <h2 id="rings-title" className="list-title">Esta semana</h2>
+        <ActivityRings rings={stats.goals.map((goal) => ({ label: goal.label, percent: goal.percent, detail: `${goal.done} de ${goal.target} días` }))} />
+      </section>
 
       <dl className="progress-stats">
         <div><dt>Sesiones</dt><dd><strong>{sessions.length}</strong></dd></div>
@@ -84,15 +86,7 @@ export default function ProgressScreen({ data, stats, onAddMeasurement }: Props)
         {volumes.length === 0 ? (
           <p className="empty-state">Cuando registres sesiones de fuerza, verás aquí cómo cambia tu volumen.</p>
         ) : (
-          <ol className="bar-chart chart-panel">
-            {volumes.map((session) => (
-              <li className="bar-column" key={session.id}>
-                <span className="bar-value">{formatNumber(session.volume)}</span>
-                <span className="bar-track"><span className="bar-fill" style={{ height: `${Math.max(4, (session.volume / stats.maxVolume) * 100)}%` }} /></span>
-                <small><time dateTime={session.finishedAt}>{formatDate(session.finishedAt)}</time></small>
-              </li>
-            ))}
-          </ol>
+          <VolumeChart sessions={volumes} />
         )}
       </section>
 

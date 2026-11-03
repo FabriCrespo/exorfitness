@@ -14,7 +14,8 @@ export default function AppHeader({ theme, storageMessage, onHome, onToggleTheme
   return (
     <header className="topbar flex items-center justify-between">
       <button className="wordmark" onClick={onHome} aria-label="ExorFitness, ir a tu rutina">
-        <Image src="/exorfitness-mark.svg" width={38} height={38} alt="" aria-hidden="true" />
+        <Image src="/exorfitness-mark.svg" width={32} height={32} alt="" aria-hidden="true" />
+        <span className="brand-name"><strong>EXORFITNESS</strong><small>エクサーフィットネス</small></span>
       </button>
       <div className="topbar-actions">
         <button className="theme-toggle" onClick={onToggleTheme} aria-label={`Cambiar a ${nextTheme}`} title={`Cambiar a ${nextTheme}`}>
