@@ -1,9 +1,19 @@
+const STAGES = [
+  { label: "ENTRADA", value: "5 min", note: "suave" },
+  { label: "ELÍPTICA", value: "20–30 min", note: "esfuerzo 4–5 de 10" },
+  { label: "VUELTA", value: "5 min", note: "muy suave" },
+];
+
 export default function CardioProtocol() {
   return (
-    <div className="cardio-protocol" aria-label="Estructura del cardio">
-      <div><span>ENTRADA</span><strong>5 min</strong><small>suave</small></div>
-      <div><span>INTERVALOS</span><strong>3 → 6 rondas</strong><small>1 vivo · 2 suave</small></div>
-      <div><span>VUELTA</span><strong>5 min</strong><small>muy fácil</small></div>
-    </div>
+    <dl className="cardio-protocol" aria-label="Estructura del cardio">
+      {STAGES.map((stage) => (
+        <div key={stage.label}>
+          <dt>{stage.label}</dt>
+          <dd><strong>{stage.value}</strong></dd>
+          <dd><small>{stage.note}</small></dd>
+        </div>
+      ))}
+    </dl>
   );
 }

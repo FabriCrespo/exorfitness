@@ -9,23 +9,29 @@ type Props = {
 };
 
 export default function WeekSelector({ days, selectedIndex, completedCount, isComplete, onSelect }: Props) {
-  const trainingDays = days.filter((day) => !day.flexible);
+  const trainingDayCount = days.filter((day) => !day.flexible).length;
+  const summary = `${completedCount} de ${trainingDayCount} días registrados`;
 
   return (
     <>
-      <div className="week-heading">
-        <div><span>Esta semana</span><strong>{completedCount} de {trainingDays.length} días registrados</strong></div>
-        <div className="week-track" aria-label={`${completedCount} de ${trainingDays.length} días registrados`}>
-          {days.map((day, index) => !day.flexible && <i key={day.label} className={isComplete(index) ? "done" : ""} />)}
-        </div>
-      </div>
-      <div className="day-strip" aria-label="Elegir día">
-        {days.map((day, index) => (
-          <button key={day.label} className={`day-tab ${selectedIndex === index ? "is-selected" : ""}`} onClick={() => onSelect(index)} aria-pressed={selectedIndex === index}>
-            <span>{day.short}</span><i className={isComplete(index) ? "day-mark is-done" : "day-mark"} />
-          </button>
-        ))}
-      </div>
+      <header className="week-heading">
+        <p><span>Esta semana</span><strong>{summary}</strong></p>
+        <ol className="week-track" aria-label={summary}>
+          {days.map((day, index) => !day.flexible && <li key={day.label} className={isComplete(index) ? "done" : undefined} />)}
+        </ol>
+      </header>
+      <nav aria-label="Elegir día">
+        <ul className="day-strip">
+          {days.map((day, index) => (
+            <li key={day.label}>
+              <button className={`day-tab ${selectedIndex === index ? "is-selected" : ""}`} onClick={() => onSelect(index)} aria-current={selectedIndex === index ? "date" : undefined} aria-label={`${day.label}${isComplete(index) ? ", registrado" : ""}`}>
+                <span>{day.short}</span>
+                <span className={isComplete(index) ? "day-mark is-done" : "day-mark"} aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </>
   );
 }
