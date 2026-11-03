@@ -50,8 +50,6 @@ const SATURDAY_CARDIO = [
   plan("elliptical", "Elíptica", "Elíptica", 1, "20–30 min", "cardio", "5 min suave de entrada en calor, 20–30 min a ritmo moderado (esfuerzo 4–5 de 10, que puedas hablar en frases completas) y 5 min muy suave para enfriar. Empieza con 20 min si hay fatiga. Nada de HIIT las primeras semanas.", "minutes"),
 ];
 
-export const CHEST_ROUTINE = WEDNESDAY.slice(0, 1);
-
 export function makeDays(): RoutineDay[] {
   return [
     { label: "Lunes", short: "Lun", focus: "Glúteos y femorales", flexible: false, exercises: MONDAY },
@@ -63,13 +61,23 @@ export function makeDays(): RoutineDay[] {
   ];
 }
 
+export const PROFILE = { name: "Fabricio", phase: "Rebuild" };
+
+/** Minutos aproximados de una rutina: 5 de calentamiento más ~2,5 por serie, redondeado a 5. */
+export function estimateMinutes(day: RoutineDay) {
+  const cardio = day.exercises.find((exercise) => exercise.trackingMode === "minutes");
+  if (cardio) return 35;
+  const sets = day.exercises.reduce((total, exercise) => total + exercise.targetSets, 0);
+  return Math.round((5 + sets * 2.5) / 5) * 5;
+}
+
 export function currentDayIndex() {
   const weekday = new Date().getDay();
   return weekday === 0 ? 0 : weekday - 1;
 }
 
-export function startOfLocalWeek() {
-  const date = new Date();
+export function startOfLocalWeek(from: Date = new Date()) {
+  const date = new Date(from);
   date.setHours(0, 0, 0, 0);
   date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
   return date;

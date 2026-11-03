@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ActiveSession, AppData, LoggedExercise, RoutineDay, SetEntry, Theme } from "./types";
+import type { ActiveSession, AppData, LoggedExercise, SetEntry, Theme } from "./types";
 import { blankSets, currentDayIndex, defaultData, isAppData, makeId, normalizeData, planExercise, startOfLocalWeek, STORAGE_KEY, THEME_KEY, volumeOf } from "./workout-data";
 
 const BACKUP_KEY = `${STORAGE_KEY}:backup`;
@@ -11,7 +11,7 @@ const confirmAction = (message: string) => window.confirm(message);
 /** Estado de la app: lectura y guardado en localStorage, tema y todas las acciones sobre la rutina. */
 export function useWorkout() {
   const [data, setData] = useState<AppData>(defaultData);
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
   const [hydrated, setHydrated] = useState(false);
   const [weekStart, setWeekStart] = useState<Date | null>(null);
   const [storageMessage, setStorageMessage] = useState("");
@@ -22,7 +22,7 @@ export function useWorkout() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        const savedTheme = window.localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
+        const savedTheme = window.localStorage.getItem(THEME_KEY) === "light" ? "light" : "dark";
         setTheme(savedTheme);
         document.documentElement.dataset.theme = savedTheme;
 
@@ -125,24 +125,25 @@ export function useWorkout() {
     }));
   };
 
-  const applyFlexRoutine = (source: RoutineDay) => {
-    const day = data.days[data.selectedDay];
-    if (!day.flexible) return;
-    if (day.exercises.length && !confirmAction(`¿Reemplazar la rutina flexible del ${day.label.toLowerCase()}?`)) return;
-    setData((current) => ({
-      ...current,
-      days: current.days.map((item, index) => (index === current.selectedDay ? { ...item, focus: source.focus, exercises: source.exercises } : item)),
-    }));
-  };
-
   const startWorkout = () => {
     const day = data.days[data.selectedDay];
     if (data.activeSession || !day?.exercises.length) return;
+    const lastSets = (exerciseId: string) =>
+      [...data.sessions].reverse().flatMap((item) => item.exercises).find((exercise) => exercise.exerciseId === exerciseId)?.sets ?? [];
     const session: ActiveSession = {
       id: makeId(),
       dayIndex: data.selectedDay,
       startedAt: new Date().toISOString(),
-      exercises: day.exercises.map((exercise) => ({ exerciseId: exercise.id, sets: exercise.trackingMode === "minutes" ? blankSets(1) : [] })),
+      exercises: day.exercises.map((exercise) => {
+        if (exercise.trackingMode === "minutes") return { exerciseId: exercise.id, sets: blankSets(1) };
+        // Series ya preparadas; si ya hiciste el ejercicio, arrancan con el peso de la última vez.
+        const previous = lastSets(exercise.id);
+        const sets = blankSets(exercise.targetSets).map((set, index) => {
+          const before = previous[index] ?? previous.at(-1);
+          return before ? { ...set, weightKg: String(before.weightKg || ""), reps: String(before.reps || "") } : set;
+        });
+        return { exerciseId: exercise.id, sets };
+      }),
     };
     setData((current) => ({ ...current, activeSession: session }));
   };
@@ -165,6 +166,37 @@ export function useWorkout() {
       exercises: session.exercises.map((exercise) => (exercise.exerciseId === exerciseId ? { ...exercise, sets: [...exercise.sets, ...blankSets(1)] } : exercise)),
     }));
 
+  const setNotes = (exerciseId: string, notes: string) =>
+    withActiveSession((session) => ({
+      ...session,
+      exercises: session.exercises.map((exercise) => (exercise.exerciseId === exerciseId ? { ...exercise, notes } : exercise)),
+    }));
+
+  /** Suma o resta peso a las series que todavía no se han guardado. */
+  const adjustPendingWeight = (exerciseId: string, delta: number) =>
+    withActiveSession((session) => ({
+      ...session,
+      exercises: session.exercises.map((exercise) => exercise.exerciseId !== exerciseId ? exercise : {
+        ...exercise,
+        sets: exercise.sets.map((set) => set.complete ? set : { ...set, weightKg: String(Math.max(0, (Number(set.weightKg) || 0) + delta)) }),
+      }),
+    }));
+
+  /** Guarda las series que ya tienen peso y repeticiones, y marca el ejercicio como hecho. */
+  const completeExercise = (exerciseId: string) =>
+    withActiveSession((session) => ({
+      ...session,
+      exercises: session.exercises.map((exercise) => exercise.exerciseId !== exerciseId ? exercise : {
+        ...exercise,
+        done: true,
+        sets: exercise.sets.map((set) => {
+          const timed = Number(set.durationMinutes) > 0;
+          const strength = Boolean(set.weightKg) && Number(set.reps) > 0;
+          return timed || strength ? { ...set, complete: true } : set;
+        }),
+      }),
+    }));
+
   const finishWorkout = () => {
     const session = data.activeSession;
     if (!session) return;
@@ -177,7 +209,7 @@ export function useWorkout() {
         ...(definition.trackingMode === "minutes" ? { durationMinutes: Number(set.durationMinutes) || 0 } : {}),
         toFailure: set.toFailure,
       }));
-      return sets.length ? [{ exerciseId: definition.id, name: definition.name, group: definition.group, sets }] : [];
+      return sets.length ? [{ exerciseId: definition.id, name: definition.name, group: definition.group, sets, ...(activeExercise.notes ? { notes: activeExercise.notes } : {}) }] : [];
     });
     if (exercises.length === 0) return;
     const finished = {
@@ -230,8 +262,8 @@ export function useWorkout() {
 
   return {
     data, theme, hydrated, weekStart, storageMessage,
-    toggleTheme, selectDay, addExercise, removeExercise, applyFlexRoutine,
-    startWorkout, updateSet, addSet, finishWorkout, cancelWorkout,
+    toggleTheme, selectDay, addExercise, removeExercise,
+    startWorkout, updateSet, addSet, setNotes, adjustPendingWeight, completeExercise, finishWorkout, cancelWorkout,
     addMeasurement, exportData, importData,
   };
 }

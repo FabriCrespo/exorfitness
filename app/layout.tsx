@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Zen_Maru_Gothic } from "next/font/google";
 import "./globals.css";
 import "./theme.css";
+import "./screens.css";
 import RegisterServiceWorker from "./_components/RegisterServiceWorker";
 
 const body = Zen_Maru_Gothic({ subsets: ["latin"], weight: ["500", "700"], variable: "--font-body-jp", display: "swap" });
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f3f5f8",
+  themeColor: "#0b1017",
   viewportFit: "cover",
   width: "device-width",
   initialScale: 1,
@@ -24,7 +25,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" data-theme="light" className={`h-full antialiased ${body.variable}`}>
+    <html lang="es" data-theme="dark" className={`h-full antialiased ${body.variable}`}>
       <body className="min-h-full flex flex-col">{children}<RegisterServiceWorker /></body>
     </html>
   );

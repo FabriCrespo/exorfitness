@@ -1,7 +1,5 @@
-import type { AppData, LoggedExercise, RoutineDay, WorkoutSession } from "./types";
-import { CHEST_ROUTINE } from "./workout-data";
-
-type FlexSource = { day: RoutineDay; reason: string };
+import type { AppData, Group, LoggedExercise, WorkoutSession } from "./types";
+import { startOfLocalWeek } from "./workout-data";
 
 const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
@@ -25,21 +23,6 @@ function comparableVolumeOf(data: AppData, newestFirst: WorkoutSession[]) {
       return set.complete && previousSet ? previousSet.weightKg * previousSet.reps : 0;
     }));
   }));
-}
-
-function suggestFlexSource(data: AppData, sessionsThisWeek: WorkoutSession[]): FlexSource | null {
-  const doneDays = new Set(sessionsThisWeek.map((session) => session.dayIndex));
-  const missingIndex = data.days.findIndex((day, index) => !day.flexible && !doneDays.has(index));
-  if (missingIndex >= 0) {
-    const day = data.days[missingIndex];
-    return { day, reason: `No aparece una sesión del ${day.label.toLowerCase()} en tu registro de esta semana.` };
-  }
-  const chestDone = sessionsThisWeek.some((session) => session.exercises.some((exercise) => exercise.group === "pecho"));
-  if (chestDone) return null;
-  return {
-    day: { label: "Pecho", short: "", focus: "Pecho", flexible: true, exercises: CHEST_ROUTINE },
-    reason: "Pecho forma parte de tu rutina y aún no aparece en tu registro de esta semana.",
-  };
 }
 
 export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
@@ -66,6 +49,22 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
   const doneDays = new Set(sessionsThisWeek.map((session) => session.dayIndex));
   const fixedDays = data.days.filter((day) => !day.flexible);
 
+  const groupGoal = (label: string, group: Group) => {
+    const planned = data.days.map((day, index) => ({ day, index })).filter(({ day }) => !day.flexible && day.exercises.some((exercise) => exercise.group === group));
+    const done = planned.filter(({ index }) => doneDays.has(index)).length;
+    return { label, done, target: planned.length, percent: planned.length ? Math.round((done / planned.length) * 100) : 0 };
+  };
+  const consistency = fixedDays.length ? Math.round((fixedDays.filter((day) => doneDays.has(data.days.indexOf(day))).length / fixedDays.length) * 100) : 0;
+  const goals = [
+    groupGoal("Glúteos", "gluteos"),
+    groupGoal("Espalda", "espalda"),
+    { label: "Constancia", done: doneDays.size, target: fixedDays.length, percent: consistency },
+  ];
+  const firstSession = data.sessions[0];
+  const weekNumber = firstSession && weekStart
+    ? Math.floor((weekStart.getTime() - startOfLocalWeek(new Date(firstSession.startedAt)).getTime()) / (7 * 86_400_000)) + 1
+    : 1;
+
   return {
     selectedDay,
     activeSession,
@@ -81,11 +80,12 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
     allTimeVolume: sum(data.sessions.map((session) => session.volume)),
     allTimeMinutes: sum(data.sessions.map((session) => session.cardioMinutes ?? 0)),
     recentSessions,
+    goals,
+    weekNumber,
     maxVolume: Math.max(1, ...recentSessions.map((session) => session.volume)),
     trainingDayCount: fixedDays.length,
     fixedDaysDone: data.days.filter((day, index) => !day.flexible && doneDays.has(index)).length,
     isDayDone: (index: number) => doneDays.has(index),
-    flexSource: suggestFlexSource(data, sessionsThisWeek),
   };
 }
 
