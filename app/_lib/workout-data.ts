@@ -173,3 +173,41 @@ export function volumeOf(sets: LoggedSet[]) {
 export function formatNumber(value: number, maximumFractionDigits = 0) {
   return new Intl.NumberFormat("es-BO", { maximumFractionDigits }).format(value);
 }
+
+type ExternalWorkout = {
+  workout_id: string; date: string; day: string;
+  exercises: { id: string; name: string; sets: { weight_kg: number; reps: number; completed?: boolean }[]; notes?: string | null }[];
+  safety?: { exercise?: string; set_number?: number; notes?: string };
+};
+
+const EXTERNAL_IDS: Record<string, { id: string; group: Group }> = {
+  hip_thrust: { id: "hip-thrust", group: "gluteos" },
+  deadlift: { id: "romanian-deadlift", group: "gluteos" },
+  leg_press: { id: "leg-press", group: "gluteos" },
+  hip_abductor: { id: "abductor", group: "gluteos" },
+};
+
+export function isExternalWorkout(value: unknown): value is ExternalWorkout {
+  const item = value as Partial<ExternalWorkout> | null;
+  return !!item && typeof item === "object" && typeof item.workout_id === "string" && typeof item.date === "string" && Array.isArray(item.exercises);
+}
+
+/** Convierte un registro externo (workout_id, exercises[].sets[]) en una sesión de la app. */
+export function sessionFromExternal(workout: ExternalWorkout, days: RoutineDay[]) {
+  const dayIndex = Math.max(0, days.findIndex((day) => day.label.toLowerCase() === workout.day.toLowerCase()));
+  const finished = new Date(`${workout.date}T19:00:00`);
+  const exercises = workout.exercises.map((exercise) => {
+    const mapped = EXTERNAL_IDS[exercise.id] ?? { id: exercise.id.replace(/_/g, "-"), group: "otro" as Group };
+    const note = [exercise.notes, workout.safety?.exercise === exercise.name ? workout.safety.notes : null].filter(Boolean).join(" ");
+    return {
+      exerciseId: mapped.id, name: exercise.name, group: mapped.group,
+      sets: exercise.sets.filter((set) => set.completed !== false).map((set) => ({ weightKg: set.weight_kg, reps: set.reps, toFailure: false })),
+      ...(note ? { notes: note } : {}),
+    };
+  });
+  return {
+    id: workout.workout_id, dayIndex,
+    startedAt: new Date(finished.getTime() - 3600000).toISOString(), finishedAt: finished.toISOString(),
+    exercises, volume: exercises.reduce((total, exercise) => total + volumeOf(exercise.sets), 0),
+  };
+}

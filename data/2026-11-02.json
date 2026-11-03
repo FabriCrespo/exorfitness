@@ -1,0 +1,6 @@
+{"workout_id":"exorfitness_2026-11-02","date":"2026-11-02","day":"Lunes","exercises":[
+{"id":"hip_thrust","name":"Hip Thrust","sets":[{"weight_kg":15,"reps":12},{"weight_kg":15,"reps":12},{"weight_kg":25,"reps":10},{"weight_kg":25,"reps":10},{"weight_kg":25,"reps":10}],"notes":null},
+{"id":"deadlift","name":"Deadlift","sets":[{"weight_kg":20,"reps":8},{"weight_kg":20,"reps":8},{"weight_kg":20,"reps":6},{"weight_kg":20,"reps":6}],"notes":"Rango registrado: 6-8 repeticiones."},
+{"id":"leg_press","name":"Leg Press","sets":[{"weight_kg":30,"reps":12},{"weight_kg":30,"reps":12},{"weight_kg":60,"reps":10},{"weight_kg":60,"reps":10},{"weight_kg":60,"reps":10}],"notes":"Mareo durante la última serie, cercano al desmayo."},
+{"id":"hip_abductor","name":"Abductors","sets":[{"weight_kg":20,"reps":12},{"weight_kg":20,"reps":12},{"weight_kg":20,"reps":12},{"weight_kg":20,"reps":12}],"notes":null}],
+"safety":{"exercise":"Leg Press","set_number":5,"notes":"Ya se encontraba bien después."}}
