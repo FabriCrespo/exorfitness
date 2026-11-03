@@ -135,7 +135,8 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
         <p className="day-kanji" aria-hidden="true"><b>{accent.kanji}</b><small>{accent.label}</small></p>
         <div className="day-banner-copy">
           <h2>{selectedDay.focus}</h2>
-          <p>{total} {total === 1 ? "ejercicio" : "ejercicios"} · ~{estimateMinutes(selectedDay)} min{activeSession && ` · ${doneCount} de ${total} hechos`}</p>
+          <p>{total} {total === 1 ? "ejercicio" : "ejercicios"} · ~{estimateMinutes(selectedDay)} min</p>
+          {activeSession && <p className="day-progress">{doneCount} de {total} hechos</p>}
         </div>
       </section>
 

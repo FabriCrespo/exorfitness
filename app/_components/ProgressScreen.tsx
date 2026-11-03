@@ -120,7 +120,7 @@ export default function ProgressScreen({ data, stats, onAddMeasurement }: Props)
                 <li className="history-row" key={session.id}>
                   <p>
                     <strong>{day?.label ?? "Sesión"} · {day?.focus ?? ""}</strong>
-                    <span><time dateTime={session.finishedAt}>{formatDate(session.finishedAt, { weekday: "long", day: "numeric", month: "long" })}</time> · {session.exercises.length} ejercicios</span>
+                    <span><time dateTime={session.finishedAt}>{formatDate(session.finishedAt, { weekday: "long", day: "numeric", month: "long" })}</time> · {session.exercises.length} {session.exercises.length === 1 ? "ejercicio" : "ejercicios"}</span>
                   </p>
                   <b>{session.cardioMinutes ? <>{formatNumber(session.cardioMinutes)} <small>min cardio</small></> : <>{formatNumber(session.volume)} <small>kg·reps</small></>}</b>
                 </li>

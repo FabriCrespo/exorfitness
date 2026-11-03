@@ -235,14 +235,6 @@ h2 { margin-bottom: 0; letter-spacing: -.035em; font-weight: 600; }
 .nav-item { min-width: 78px; position: relative; padding: 5px 12px 7px; display: flex; align-items: center; justify-content: center; border: 0; background: transparent; color: var(--quiet); font-size: 10px; cursor: pointer; }
 .nav-item.is-active { color: var(--rose-bright); }
 .nav-item.is-active::after { content: ""; position: absolute; right: 20px; bottom: 0; left: 20px; height: 2px; background: var(--rose); }
-.progress-stats { margin-bottom: 25px; display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.progress-stats > div { min-width: 0; min-height: 76px; padding: 11px 6px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; border-right: 1px solid var(--line); }
-.progress-stats > div:last-child { border-right: 0; }
-.progress-stats span { color: var(--quiet); font-size: 9px; }
-.progress-stats strong { color: var(--rose-bright); font-size: clamp(12px, 3.7vw, 18px); font-weight: 550; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
-.progress-stats strong small { display: block; margin-top: 2px; color: var(--muted); font-size: 8px; font-weight: 400; letter-spacing: 0; }
-.progress-stats small { margin-left: 3px; color: var(--muted); font-size: 9px; font-weight: 400; }
-.content-section { margin: 0 0 25px; }
 .exercise-progress-section { padding-top: 2px; }
 .exercise-progress-controls { margin: 10px 0 3px; display: grid; grid-template-columns: minmax(0,1.35fr) minmax(0,1fr); gap: 8px; }
 .exercise-progress-controls label { min-width: 0; display: flex; flex-direction: column; gap: 5px; color: var(--quiet); font-size: 9px; }
@@ -291,16 +283,11 @@ h2 { margin-bottom: 0; letter-spacing: -.035em; font-weight: 600; }
 .measurement-list, .history-list { border-top: 1px solid var(--line); }
 .measurement-row, .history-row { min-height: 54px; padding: 8px 0; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px; border-bottom: 1px solid var(--line); }
 .measurement-row > p, .history-row > p { display: flex; flex-direction: column; gap: 3px; }
-.measurement-row strong, .history-row strong { color: var(--ink); font-size: 11px; font-weight: 550; text-transform: capitalize; }
+.measurement-row strong, .history-row strong { color: var(--ink); font-size: 13px; font-weight: 500; }
 .measurement-row span, .history-row span { color: var(--quiet); font-size: 9px; }
 .measurement-row b, .history-row b { color: var(--rose-bright); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .measurement-row small, .history-row small { color: var(--muted); font-size: 9px; }
 .measurement-row > span:last-child { grid-column: 2; justify-self: end; color: var(--muted); font-size: 9px; }
-.data-section { padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.data-section h2 { margin-bottom: 7px; font-size: 16px; }
-.data-section > p:not(.storage-note):not(.inline-message) { max-width: 590px; margin-bottom: 15px; color: var(--muted); font-size: 11px; line-height: 1.6; }
-.backup-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.backup-actions .primary-button, .secondary-button { min-height: 39px; font-size: 10px; }
 .secondary-button { position: relative; overflow: hidden; border-color: var(--line); background: transparent; color: var(--ink); cursor: pointer; }
 .secondary-button input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
 .storage-note { margin: 13px 0 0; display: flex; align-items: center; gap: 7px; color: var(--quiet); font-size: 9px; }
@@ -369,9 +356,6 @@ button:active:not(:disabled) { transform: scale(.975); }
   .routine-photo { width: 44px; height: 58px; flex-basis: 44px; }
   .routine-copy { gap: 2px 5px; }
   .routine-copy strong { font-size: 12px; }
-  .progress-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .progress-stats > div:nth-child(2) { border-right: 0; }
-  .progress-stats > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
 }
 
 @media (max-width: 430px) {
