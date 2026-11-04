@@ -1,7 +1,8 @@
 "use client";
 
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, useMemo, useState } from "react";
 import type { AppData } from "../_lib/types";
+import { periodPayload, sessionDays, sessionWeeks } from "../_lib/export-sessions";
 
 type Props = {
   data: AppData;
@@ -12,6 +13,11 @@ type Props = {
 
 export default function DataScreen({ data, storageMessage, onExport, onImport }: Props) {
   const [importMessage, setImportMessage] = useState("");
+  const [scope, setScope] = useState<"day" | "week">("day");
+  const [selected, setSelected] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+  const periods = useMemo(() => (scope === "day" ? sessionDays(data.sessions) : sessionWeeks(data.sessions)), [data.sessions, scope]);
+  const period = periods.find((item) => item.key === selected) ?? periods[0];
   const exerciseCount = data.days.reduce((sum, day) => sum + day.exercises.length, 0);
 
   const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +29,29 @@ export default function DataScreen({ data, storageMessage, onExport, onImport }:
     if (message) setImportMessage(message);
     input.value = "";
   };
+
+  const payload = () => JSON.stringify(periodPayload(period, scope, data), null, 2);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(payload());
+      setShareMessage("Copiado al portapapeles.");
+    } catch {
+      setShareMessage("No se pudo copiar. Prueba con Descargar.");
+    }
+  };
+
+  const download = () => {
+    const url = URL.createObjectURL(new Blob([payload()], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `exorfitness-${scope === "day" ? "dia" : "semana"}-${period.key}.json`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setShareMessage("Archivo descargado.");
+  };
+
+  const changeScope = (next: "day" | "week") => { setScope(next); setSelected(""); setShareMessage(""); };
 
   return (
     <article className="page-content" aria-labelledby="page-title">
@@ -39,6 +68,31 @@ export default function DataScreen({ data, storageMessage, onExport, onImport }:
         </menu>
         {importMessage && <p className="inline-message" role="status">{importMessage}</p>}
         <p className="storage-note"><i />{storageMessage || "Se guarda al momento."}</p>
+      </section>
+
+      <section className="content-section data-section" aria-labelledby="share-title">
+        <h2 id="share-title">Copiar o descargar</h2>
+        <p>Elige un día o una semana de sesiones.</p>
+        {period ? (
+          <>
+            <div className="segmented share-scope" role="group" aria-label="Periodo">
+              <button type="button" className={scope === "day" ? "is-active" : undefined} aria-pressed={scope === "day"} onClick={() => changeScope("day")}>Día</button>
+              <button type="button" className={scope === "week" ? "is-active" : undefined} aria-pressed={scope === "week"} onClick={() => changeScope("week")}>Semana</button>
+            </div>
+            <label className="share-select"><span className="sr-only">{scope === "day" ? "Día" : "Semana"}</span>
+              <select value={period.key} onChange={(event) => { setSelected(event.target.value); setShareMessage(""); }}>
+                {periods.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
+              </select>
+            </label>
+            <menu className="backup-actions">
+              <li><button className="primary-button" onClick={copy}>Copiar</button></li>
+              <li><button className="secondary-button" onClick={download}>Descargar</button></li>
+            </menu>
+            {shareMessage && <p className="inline-message" role="status">{shareMessage}</p>}
+          </>
+        ) : (
+          <p className="empty-state">Cuando termines una sesión podrás copiarla o descargarla aquí.</p>
+        )}
       </section>
 
       <section className="content-section" aria-labelledby="summary-title">

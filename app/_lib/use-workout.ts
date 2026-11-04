@@ -241,10 +241,13 @@ export function useWorkout() {
   const importData = async (file: File): Promise<string | null> => {
     try {
       const parsed: unknown = JSON.parse(await file.text());
-      if (isExternalWorkout(parsed)) {
-        const session = sessionFromExternal(parsed, data.days);
-        setData((current) => ({ ...current, sessions: [...current.sessions.filter((item) => item.id !== session.id), session].sort((a, b) => a.finishedAt.localeCompare(b.finishedAt)) }));
-        return "Sesión importada y añadida a tu historial.";
+      const list: unknown[] = Array.isArray(parsed) ? parsed : [parsed];
+      const external = list.filter(isExternalWorkout);
+      if (external.length > 0 && external.length === list.length) {
+        const sessions = external.map((workout) => sessionFromExternal(workout, data.days));
+        const ids = new Set(sessions.map((item) => item.id));
+        setData((current) => ({ ...current, sessions: [...current.sessions.filter((item) => !ids.has(item.id)), ...sessions].sort((x, y) => x.finishedAt.localeCompare(y.finishedAt)) }));
+        return sessions.length === 1 ? "Sesión importada y añadida a tu historial." : `${sessions.length} sesiones importadas y añadidas a tu historial.`;
       }
       if (!isAppData(parsed)) throw new Error("Formato no válido");
       if (!confirmAction("Importar este respaldo reemplazará tus datos actuales en este dispositivo. ¿Continuar?")) return null;
