@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ActiveSession, AppData, LoggedExercise, SetEntry, Theme } from "./types";
+import type { ActiveSession, AppData, LoggedExercise, SetEntry, Theme, WorkoutSession } from "./types";
 import { isExternalWorkout, sessionFromExternal, blankSets, currentDayIndex, defaultData, isAppData, makeId, normalizeData, planExercise, startOfLocalWeek, STORAGE_KEY, THEME_KEY, volumeOf } from "./workout-data";
 
 const BACKUP_KEY = `${STORAGE_KEY}:backup`;
@@ -187,6 +187,9 @@ export function useWorkout() {
       }),
     }));
 
+  /** Cardio opcional al final de una sesión de fuerza. */
+  const setExtraCardio = (minutes: string) => withActiveSession((session) => ({ ...session, extraCardioMinutes: minutes }));
+
   const finishWorkout = () => {
     const session = data.activeSession;
     if (!session) return;
@@ -201,6 +204,8 @@ export function useWorkout() {
       }));
       return sets.length ? [{ exerciseId: definition.id, name: definition.name, group: definition.group, sets, ...(activeExercise.notes ? { notes: activeExercise.notes } : {}) }] : [];
     });
+    const extraCardio = Number(session.extraCardioMinutes) || 0;
+    if (extraCardio > 0) exercises.push({ exerciseId: "cardio-extra", name: "Cardio al final", group: "cardio", sets: [{ weightKg: 0, reps: 0, durationMinutes: extraCardio, toFailure: false }] });
     if (exercises.length === 0) return;
     const finished = {
       id: session.id,
@@ -213,6 +218,13 @@ export function useWorkout() {
     };
     setData((current) => ({ ...current, sessions: [...current.sessions, finished], activeSession: null }));
   };
+
+  /** Corrige una sesión ya guardada (series, cardio al final, fecha). */
+  const updateSession = (session: WorkoutSession) =>
+    setData((current) => ({ ...current, sessions: current.sessions.map((item) => (item.id === session.id ? session : item)).sort((a, b) => a.finishedAt.localeCompare(b.finishedAt)) }));
+
+  const deleteSession = (sessionId: string) =>
+    setData((current) => ({ ...current, sessions: current.sessions.filter((item) => item.id !== sessionId) }));
 
   const cancelWorkout = () => {
     if (!data.activeSession) return;
@@ -261,7 +273,7 @@ export function useWorkout() {
   return {
     data, theme, hydrated, weekStart, storageMessage,
     toggleTheme, selectDay, addExercise, removeExercise,
-    startWorkout, updateSet, addSet, setNotes, completeExercise, finishWorkout, cancelWorkout,
+    startWorkout, updateSet, addSet, setNotes, completeExercise, setExtraCardio, finishWorkout, updateSession, deleteSession, cancelWorkout,
     addMeasurement, exportData, importData,
   };
 }

@@ -1,17 +1,20 @@
 "use client";
 
 import { type FormEvent, useMemo, useState } from "react";
-import type { AppData, Measurement } from "../_lib/types";
+import type { AppData, Measurement, WorkoutSession } from "../_lib/types";
 import type { WorkoutStats } from "../_lib/workout-stats";
 import { formatDate, formatNumber } from "../_lib/workout-data";
 import ActivityRings from "./ActivityRings";
 import ExerciseProgressPanel from "./ExerciseProgressPanel";
+import SessionEditor from "./SessionEditor";
 import VolumeChart from "./VolumeChart";
 
 type Props = {
   data: AppData;
   stats: WorkoutStats;
   onAddMeasurement: (area: string, value: number) => void;
+  onUpdateSession: (session: WorkoutSession) => void;
+  onDeleteSession: (sessionId: string) => void;
 };
 
 /** Agrupa las medidas por zona, de la más reciente a la más antigua. */
@@ -56,7 +59,9 @@ function MeasurementForm({ onAdd }: { onAdd: (area: string, value: number) => vo
   );
 }
 
-export default function ProgressScreen({ data, stats, onAddMeasurement }: Props) {
+export default function ProgressScreen({ data, stats, onAddMeasurement, onUpdateSession, onDeleteSession }: Props) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editing = data.sessions.find((item) => item.id === editingId);
   const { sessions, days } = data;
   const volumes = [...stats.recentSessions].reverse();
   const measurementsByArea = useMemo(() => groupByArea(data.measurements), [data.measurements]);
@@ -118,17 +123,30 @@ export default function ProgressScreen({ data, stats, onAddMeasurement }: Props)
               const day = days[session.dayIndex];
               return (
                 <li className="history-row" key={session.id}>
-                  <p>
+                  <button type="button" className="history-edit" onClick={() => setEditingId(session.id)} aria-label={`Editar sesión del ${formatDate(session.finishedAt, { day: "numeric", month: "long" })}`}>
+                  <span className="history-copy">
                     <strong>{day?.label ?? "Sesión"} · {day?.focus ?? ""}</strong>
                     <span><time dateTime={session.finishedAt}>{formatDate(session.finishedAt, { weekday: "long", day: "numeric", month: "long" })}</time> · {session.exercises.length} {session.exercises.length === 1 ? "ejercicio" : "ejercicios"}</span>
-                  </p>
-                  <b>{session.cardioMinutes ? <>{formatNumber(session.cardioMinutes)} <small>min cardio</small></> : <>{formatNumber(session.volume)} <small>kg·reps</small></>}</b>
+                  </span>
+                  <b>{session.volume > 0 ? <>{formatNumber(session.volume)} <small>kg·reps{session.cardioMinutes ? ` · ${formatNumber(session.cardioMinutes)} min` : ""}</small></> : <>{formatNumber(session.cardioMinutes ?? 0)} <small>min cardio</small></>}</b>
+                  <i className="history-chevron" aria-hidden="true">›</i>
+                  </button>
                 </li>
               );
             })}
           </ol>
         )}
       </section>
+      {editing && (
+        <SessionEditor
+          key={editing.id}
+          session={editing}
+          dayTitle={`${days[editing.dayIndex]?.label ?? "Sesión"} · ${days[editing.dayIndex]?.focus ?? ""}`}
+          onClose={() => setEditingId(null)}
+          onSave={onUpdateSession}
+          onDelete={onDeleteSession}
+        />
+      )}
     </article>
   );
 }

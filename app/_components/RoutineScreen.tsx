@@ -22,12 +22,13 @@ type Props = {
   onAddSet: (exerciseId: string) => void;
   onSetNotes: (exerciseId: string, notes: string) => void;
   onCompleteExercise: (exerciseId: string) => void;
+  onSetExtraCardio: (minutes: string) => void;
 };
 
 const isExerciseDone = (exercise?: ActiveExercise) =>
   Boolean(exercise && (exercise.done || (exercise.sets.length > 0 && exercise.sets.every((set) => set.complete))));
 
-export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onSetNotes, onCompleteExercise }: Props) {
+export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onSetNotes, onCompleteExercise, onSetExtraCardio }: Props) {
   const { selectedDay, activeSession, isCardioDay, newestFirst } = stats;
   const exercises = selectedDay.exercises;
   const total = exercises.length;
@@ -150,6 +151,27 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
             return <RoutineExerciseRow key={`${exercise.id}-${index}`} exercise={exercise} index={index} status={status} onOpen={() => setOpenId(exercise.id)} />;
           })}
         </ol>
+      )}
+
+      {activeSession && !isCardioDay && (
+        <section className="card extra-cardio" aria-labelledby="extra-cardio-title">
+          <header>
+            <h2 id="extra-cardio-title" className="list-title">Cardio al final</h2>
+            <p>Opcional. Suma los minutos que hiciste después de entrenar.</p>
+          </header>
+          <div className="extra-cardio-controls">
+            <div className="extra-cardio-chips" role="group" aria-label="Minutos de cardio">
+              {[10, 15, 20, 30].map((minutes) => {
+                const active = activeSession.extraCardioMinutes === String(minutes);
+                return <button key={minutes} type="button" className={active ? "is-active" : undefined} aria-pressed={active} onClick={() => onSetExtraCardio(active ? "" : String(minutes))}>{minutes}</button>;
+              })}
+            </div>
+            <label className="extra-cardio-input">
+              <input type="number" inputMode="numeric" min="0" max="240" placeholder="0" value={activeSession.extraCardioMinutes ?? ""} onChange={(event) => onSetExtraCardio(event.target.value)} aria-label="Minutos de cardio" />
+              <span>min</span>
+            </label>
+          </div>
+        </section>
       )}
 
       <footer className="action-bar">

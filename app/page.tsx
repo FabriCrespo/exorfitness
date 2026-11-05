@@ -19,7 +19,7 @@ export default function Home() {
 
   if (!workout.hydrated) {
     return (
-      <main className="loading-screen">
+  <main className="loading-screen">
         <p className="wordmark">exor<span>fitness</span></p>
         <p>Abriendo tu rutina</p>
       </main>
@@ -54,9 +54,10 @@ export default function Home() {
             onAddSet={workout.addSet}
             onSetNotes={workout.setNotes}
             onCompleteExercise={workout.completeExercise}
+            onSetExtraCardio={workout.setExtraCardio}
           />
         )}
-        {tab === "progress" && <ProgressScreen data={data} stats={stats} onAddMeasurement={workout.addMeasurement} />}
+        {tab === "progress" && <ProgressScreen data={data} stats={stats} onAddMeasurement={workout.addMeasurement} onUpdateSession={workout.updateSession} onDeleteSession={workout.deleteSession} />}
         {tab === "data" && <DataScreen data={data} storageMessage={workout.storageMessage} onExport={workout.exportData} onImport={workout.importData} />}
       </main>
 
