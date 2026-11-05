@@ -61,9 +61,9 @@ export default function DataScreen({ data, storageMessage, onExport, onImport }:
 
       <section className="content-section data-section" aria-labelledby="backup-title">
         <h2 id="backup-title">Tu registro se queda en este navegador</h2>
-        <p>Descarga una copia JSON para guardarla o pasarla a otro dispositivo.</p>
+        <p>Respaldo completo de toda la app. Para un solo día o semana, usa la sección de abajo.</p>
         <menu className="backup-actions">
-          <li><button className="primary-button" onClick={onExport}>Exportar JSON</button></li>
+          <li><button className="primary-button" onClick={onExport}>Respaldo completo</button></li>
           <li><label className="secondary-button">Importar JSON<input type="file" accept="application/json,.json" onChange={handleImport} /></label></li>
         </menu>
         {importMessage && <p className="inline-message" role="status">{importMessage}</p>}
@@ -84,6 +84,10 @@ export default function DataScreen({ data, storageMessage, onExport, onImport }:
                 {periods.map((item) => <option key={item.key} value={item.key}>{item.label}</option>)}
               </select>
             </label>
+            <figure className="share-preview">
+              <figcaption>Vista previa · {period.sessions.length} {period.sessions.length === 1 ? "sesión" : "sesiones"}</figcaption>
+              <pre tabIndex={0} aria-label="Vista previa del JSON"><code>{payload()}</code></pre>
+            </figure>
             <menu className="backup-actions">
               <li><button className="primary-button" onClick={copy}>Copiar</button></li>
               <li><button className="secondary-button" onClick={download}>Descargar</button></li>
