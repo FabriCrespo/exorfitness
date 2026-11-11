@@ -10,7 +10,7 @@ const KINDS = [
 ] as const;
 
 export default function PushSettings({ data }: { data: AppData }) {
-  const { state, prefs, busy, message, enable, disable, updatePrefs } = usePush(data);
+  const { state, prefs, busy, message, enable, disable, sendTest, updatePrefs } = usePush(data);
 
   return (
     <section className="content-section data-section" aria-labelledby="push-title">
@@ -40,11 +40,14 @@ export default function PushSettings({ data }: { data: AppData }) {
             </label>
           )}
           <menu className="backup-actions">
-            <li>
-              {state === "on"
-                ? <button className="secondary-button" onClick={disable} disabled={busy}>Desactivar</button>
-                : <button className="primary-button" onClick={enable} disabled={busy}>{busy ? "Activando…" : "Activar notificaciones"}</button>}
-            </li>
+            {state === "on" ? (
+              <>
+                <li><button className="primary-button" onClick={sendTest} disabled={busy}>Enviar prueba</button></li>
+                <li><button className="secondary-button" onClick={disable} disabled={busy}>Desactivar</button></li>
+              </>
+            ) : (
+              <li><button className="primary-button" onClick={enable} disabled={busy}>{busy ? "Activando…" : "Activar notificaciones"}</button></li>
+            )}
           </menu>
         </>
       )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { currentSubscription, DEFAULT_PREFS, isIosBrowser, type PushPrefs, pushSupported, readPrefs, savePrefs, subscribeToPush, syncSubscription, unsubscribeFromPush } from "./push-client";
+import { currentSubscription, DEFAULT_PREFS, isIosBrowser, type PushPrefs, pushSupported, readPrefs, savePrefs, sendTestPush, subscribeToPush, syncSubscription, unsubscribeFromPush } from "./push-client";
 import type { AppData } from "./types";
 
 export type PushState = "checking" | "unsupported" | "needs-install" | "off" | "on" | "blocked";
@@ -58,6 +58,19 @@ export function usePush(data: AppData) {
     setBusy(false);
   }, []);
 
+  const sendTest = useCallback(async () => {
+    setBusy(true);
+    setMessage("");
+    try {
+      await sendTestPush();
+      setMessage("Prueba enviada. Debería llegar en unos segundos.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "No se pudo enviar la prueba.");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
   const updatePrefs = useCallback((patch: Partial<PushPrefs>) => {
     setPrefs((current) => {
       const next = { ...current, ...patch };
@@ -66,5 +79,5 @@ export function usePush(data: AppData) {
     });
   }, []);
 
-  return { state, prefs, busy, message, enable, disable, updatePrefs };
+  return { state, prefs, busy, message, enable, disable, sendTest, updatePrefs };
 }

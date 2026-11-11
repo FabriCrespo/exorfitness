@@ -85,6 +85,17 @@ export async function syncSubscription(subscription: PushSubscription, prefs: Pu
   }
 }
 
+/** Pide al servidor una notificación de prueba para este dispositivo. */
+export async function sendTestPush() {
+  const subscription = await currentSubscription();
+  if (!subscription) throw new Error("Este dispositivo no está suscrito. Activa las notificaciones primero.");
+  const response = await fetch("/api/push/test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endpoint: subscription.endpoint }) });
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? "No se pudo enviar la prueba.");
+  }
+}
+
 /** Programa el aviso de fin de descanso en el servidor. Devuelve una función para cancelarlo. */
 export async function scheduleRestPush(seconds: number) {
   const prefs = readPrefs();

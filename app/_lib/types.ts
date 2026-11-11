@@ -21,7 +21,7 @@ export type RoutineDay = {
 
 export type SetEntry = { id: string; weightKg: string; reps: string; durationMinutes?: string; complete: boolean; toFailure: boolean };
 export type ActiveExercise = { exerciseId: string; sets: SetEntry[]; notes?: string; done?: boolean };
-export type ActiveSession = { id: string; dayIndex: number; startedAt: string; exercises: ActiveExercise[]; extraCardioMinutes?: string; date?: string; extras?: RoutineExercise[] };
+export type ActiveSession = { id: string; dayIndex: number; startedAt: string; exercises: ActiveExercise[]; extraCardioMinutes?: string; date?: string; extras?: RoutineExercise[]; custom?: boolean; title?: string };
 export type LoggedSet = { weightKg: number; reps: number; durationMinutes?: number; toFailure: boolean };
 export type LoggedExercise = { exerciseId: string; name: string; group: Group; sets: LoggedSet[]; notes?: string };
 export type WorkoutSession = {
@@ -32,6 +32,9 @@ export type WorkoutSession = {
   exercises: LoggedExercise[];
   volume: number;
   cardioMinutes?: number;
+  /** Sesión libre armada desde el mapa muscular: no cuenta como un día de la rutina. */
+  custom?: boolean;
+  title?: string;
 };
 export type Measurement = { id: string; area: string; value: number; unit: string; recordedAt: string };
 export type AppData = {
@@ -44,5 +47,5 @@ export type AppData = {
   measurements: Measurement[];
 };
 
-export type Tab = "home" | "routine" | "progress" | "data";
+export type Tab = "home" | "routine" | "progress" | "body" | "data";
 export type Theme = "light" | "dark";

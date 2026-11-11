@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import AppHeader from "./_components/AppHeader";
 import AppNavigation from "./_components/AppNavigation";
+import BodyScreen from "./_components/BodyScreen";
 import DataScreen from "./_components/DataScreen";
 import ExerciseDialog from "./_components/ExerciseDialog";
 import HomeScreen from "./_components/HomeScreen";
@@ -63,6 +64,7 @@ export default function Home() {
             onSetExtraCardio={workout.setExtraCardio}
           />
         )}
+        {tab === "body" && <BodyScreen data={data} library={library} onStartCustom={(exercises, title) => { workout.startCustomWorkout(exercises, title); setTab("routine"); }} />}
         {tab === "progress" && <ProgressScreen data={data} stats={stats} onAddMeasurement={workout.addMeasurement} onUpdateSession={workout.updateSession} onDeleteSession={workout.deleteSession} />}
         {tab === "data" && <DataScreen data={data} storageMessage={workout.storageMessage} onExport={workout.exportData} onImport={workout.importData} />}
       </main>

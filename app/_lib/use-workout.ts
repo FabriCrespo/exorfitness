@@ -148,6 +148,21 @@ export function useWorkout() {
     }));
   };
 
+  /** Sesión libre con los ejercicios elegidos en el mapa muscular. */
+  const startCustomWorkout = (exercises: RoutineExercise[], title: string) => {
+    if (data.activeSession || exercises.length === 0) return;
+    const session: ActiveSession = {
+      id: makeId(),
+      dayIndex: data.selectedDay,
+      startedAt: new Date().toISOString(),
+      custom: true,
+      title,
+      extras: exercises,
+      exercises: exercises.map((exercise) => ({ exerciseId: exercise.id, sets: buildSets(exercise) })),
+    };
+    setData((current) => ({ ...current, activeSession: session }));
+  };
+
   /** `date` (AAAA-MM-DD) sirve para registrar un entreno de otro día; sin ella cuenta como hoy. */
   const startWorkout = (date?: string) => {
     const day = data.days[data.selectedDay];
@@ -237,6 +252,7 @@ export function useWorkout() {
       startedAt: moveToDate(session.startedAt),
       finishedAt: moveToDate(new Date().toISOString()),
       exercises,
+      ...(session.custom ? { custom: true, title: session.title } : {}),
       volume: exercises.reduce((total, exercise) => total + volumeOf(exercise.sets), 0),
       cardioMinutes: exercises.flatMap((exercise) => exercise.sets).reduce((total, set) => total + (set.durationMinutes ?? 0), 0),
     };
@@ -297,7 +313,7 @@ export function useWorkout() {
   return {
     data, theme, hydrated, weekStart, storageMessage,
     toggleTheme, selectDay, addExercise, removeExercise,
-    startWorkout, updateSet, addSet, setNotes, completeExercise, setExtraCardio, finishWorkout, updateSession, deleteSession, cancelWorkout,
+    startWorkout, updateSet, addSet, setNotes, completeExercise, setExtraCardio, startCustomWorkout, finishWorkout, updateSession, deleteSession, cancelWorkout,
     addMeasurement, exportData, importData,
   };
 }

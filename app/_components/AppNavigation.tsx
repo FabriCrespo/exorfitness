@@ -9,6 +9,7 @@ const ITEMS: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: "home", label: "Inicio", icon: icon(<path d="M4 11.5 12 5l8 6.5V20h-5v-5H9v5H4z" />) },
   { id: "routine", label: "Rutina", icon: icon(<path d="M3 9v6M6 7v10M18 7v10M21 9v6M6 12h12" />) },
   { id: "progress", label: "Progreso", icon: icon(<path d="M5 20V12M10 20V6M15 20v-9M20 20V9" />) },
+  { id: "body", label: "Cuerpo", icon: icon(<><circle cx="12" cy="5" r="2.2" /><path d="M8 10h8l-1 5-1 6h-4l-1-6zM8 10 6 15M16 10l2 5" /></>) },
   { id: "data", label: "Datos", icon: icon(<path d="M8 4h8l3 3v13H5V4zM9 11h6M9 15h6" />) },
 ];
 

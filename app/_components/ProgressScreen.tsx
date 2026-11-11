@@ -130,7 +130,7 @@ export default function ProgressScreen({ data, stats, onAddMeasurement, onUpdate
                 <li className="history-row" key={session.id}>
                   <button type="button" className="history-edit" onClick={() => setEditingId(session.id)} aria-label={`Editar sesión del ${formatDate(session.finishedAt, { day: "numeric", month: "long" })}`}>
                   <span className="history-copy">
-                    <strong>{day?.label ?? "Sesión"} · {day?.focus ?? ""}</strong>
+                    <strong>{session.custom ? session.title : `${day?.label ?? "Sesión"} · ${day?.focus ?? ""}`}</strong>
                     <span><time dateTime={session.finishedAt}>{formatDate(session.finishedAt, { weekday: "long", day: "numeric", month: "long" })}</time> · {session.exercises.length} {session.exercises.length === 1 ? "ejercicio" : "ejercicios"}</span>
                   </span>
                   <b>{session.volume > 0 ? <>{formatNumber(session.volume)} <small>kg·reps{session.cardioMinutes ? ` · ${formatNumber(session.cardioMinutes)} min` : ""}</small></> : <>{formatNumber(session.cardioMinutes ?? 0)} <small>min cardio</small></>}</b>
@@ -147,7 +147,7 @@ export default function ProgressScreen({ data, stats, onAddMeasurement, onUpdate
           key={editing.id}
           session={editing}
           library={library}
-          dayTitle={`${days[editing.dayIndex]?.label ?? "Sesión"} · ${days[editing.dayIndex]?.focus ?? ""}`}
+          dayTitle={editing.custom ? editing.title ?? "Sesión libre" : `${days[editing.dayIndex]?.label ?? "Sesión"} · ${days[editing.dayIndex]?.focus ?? ""}`}
           onClose={() => setEditingId(null)}
           onSave={onUpdateSession}
           onDelete={onDeleteSession}

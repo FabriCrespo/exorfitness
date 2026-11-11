@@ -297,3 +297,32 @@ input[type="checkbox"][role="switch"]:checked::before { transform: translateX(17
 .push-list .switch-row span { display: grid; gap: 2px; }
 .push-list small { color: var(--quiet); font-size: 11px; }
 .push-time input { width: 100%; }
+
+/* Mapa muscular */
+.body-card { display: grid; gap: var(--space-3); justify-items: center; }
+.body-card .segmented { width: 100%; }
+.body-map { width: min(100%, 230px); height: auto; overflow: visible; }
+.body-base { pointer-events: none; }
+.body-base path, .body-base circle, .body-base rect { fill: var(--fill); stroke: var(--separator); stroke-width: 1; }
+.muscle path { fill: transparent; stroke: var(--quiet); stroke-width: 1; stroke-linejoin: round; transition: fill .2s ease, stroke .2s ease; }
+.muscle { cursor: pointer; outline: none; }
+.muscle:hover path { fill: var(--accent-wash); }
+.muscle:focus-visible path { stroke: var(--accent); stroke-width: 2; }
+.muscle.is-recovering path { fill: color-mix(in srgb, var(--bad) 30%, transparent); stroke: var(--bad); }
+.muscle.is-selected path { fill: var(--accent); stroke: var(--accent-bright); }
+.body-legend { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); color: var(--muted); font-size: 11px; }
+.body-legend li { display: flex; align-items: center; gap: var(--space-1); }
+.body-legend i { width: 10px; height: 10px; border-radius: 3px; border: 1px solid var(--quiet); }
+.body-legend i.is-selected { background: var(--accent); border-color: var(--accent); }
+.body-legend i.is-recovering { background: color-mix(in srgb, var(--bad) 30%, transparent); border-color: var(--bad); }
+.muscle-chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.muscle-chips button { display: grid; gap: 1px; min-height: 40px; padding: var(--space-1) var(--space-3); border: 1px solid var(--separator); border-radius: 12px; background: transparent; color: var(--ink); font-size: 13px; text-align: left; cursor: pointer; }
+.muscle-chips small { color: var(--quiet); font-size: 10px; }
+.muscle-chips button.is-active { background: var(--accent); border-color: var(--accent); color: var(--button-ink); }
+.muscle-chips button.is-active small { color: var(--button-ink); opacity: .75; }
+.match-row { display: flex; align-items: flex-start; gap: var(--space-3); width: 100%; cursor: pointer; }
+.match-row input { margin-top: 3px; accent-color: var(--accent); }
+.match-copy { display: grid; gap: 2px; min-width: 0; }
+.match-copy strong { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.match-copy small { color: var(--quiet); font-size: 11px; }
+.body-screen { padding-bottom: var(--space-4); }

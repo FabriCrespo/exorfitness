@@ -29,9 +29,11 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
   const baseDay = data.days[data.selectedDay] ?? data.days[0];
   const activeSession = data.activeSession?.dayIndex === data.selectedDay ? data.activeSession : null;
   // Los ejercicios añadidos solo a la sesión en curso se muestran junto a los del día.
-  const selectedDay = activeSession?.extras?.length ? { ...baseDay, exercises: [...baseDay.exercises, ...activeSession.extras] } : baseDay;
+  const selectedDay = activeSession?.custom
+    ? { ...baseDay, focus: activeSession.title ?? "Sesión libre", exercises: activeSession.extras ?? [] }
+    : activeSession?.extras?.length ? { ...baseDay, exercises: [...baseDay.exercises, ...activeSession.extras] } : baseDay;
   const newestFirst = [...data.sessions].reverse();
-  const [lastDaySession, previousDaySession] = newestFirst.filter((session) => session.dayIndex === data.selectedDay);
+  const [lastDaySession, previousDaySession] = newestFirst.filter((session) => session.dayIndex === data.selectedDay && !session.custom);
 
   const isCardioDay = selectedDay.exercises.some((exercise) => exercise.trackingMode === "minutes");
   const activeVolume = activeVolumeOf(data);
@@ -47,7 +49,7 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
   }
 
   const recentSessions = newestFirst.filter((session) => session.volume > 0).slice(0, 6);
-  const sessionsThisWeek = weekStart ? data.sessions.filter((session) => new Date(session.finishedAt) >= weekStart) : [];
+  const sessionsThisWeek = weekStart ? data.sessions.filter((session) => !session.custom && new Date(session.finishedAt) >= weekStart) : [];
   const doneDays = new Set(sessionsThisWeek.map((session) => session.dayIndex));
   const fixedDays = data.days.filter((day) => !day.flexible);
   // Lunes = 0 … domingo = 6. Un día fijo anterior a hoy, sin sesión esta semana, cuenta como "no fui".

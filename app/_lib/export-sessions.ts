@@ -12,8 +12,8 @@ export function sessionToExternal(session: WorkoutSession, data: AppData) {
   return {
     workout_id: session.id.startsWith("exorfitness_") ? session.id : `exorfitness_${date}_${session.id.slice(0, 6)}`,
     date,
-    day: day?.label ?? "",
-    name: day?.focus ?? "",
+    day: session.custom ? "Libre" : day?.label ?? "",
+    name: session.custom ? session.title ?? "Sesión libre" : day?.focus ?? "",
     started_at: session.startedAt,
     finished_at: session.finishedAt,
     exercises: session.exercises.map((exercise) => ({
