@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# suscripciones push (contienen endpoints de dispositivos)
+/data/push-subscriptions.json

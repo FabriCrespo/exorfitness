@@ -15,3 +15,27 @@ self.addEventListener("fetch", (event) => {
     }).catch(() => caches.match(request).then((hit) => hit || caches.match("/"))),
   );
 });
+
+// Notificaciones push: el servidor envía { title, body, tag, url }.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data ? event.data.text() : "" }; }
+  event.waitUntil(self.registration.showNotification(data.title || "ExorFitness", {
+    body: data.body || "",
+    icon: "/icon-192",
+    badge: "/icon-192",
+    tag: data.tag,
+    renotify: Boolean(data.tag),
+    vibrate: [120, 60, 120],
+    data: { url: data.url || "/" },
+  }));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/";
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
+    const open = windows.find((client) => "focus" in client);
+    return open ? open.focus() : self.clients.openWindow(url);
+  }));
+});

@@ -2,6 +2,7 @@
 
 import { type ChangeEvent, useMemo, useState } from "react";
 import type { AppData } from "../_lib/types";
+import PushSettings from "./PushSettings";
 import { periodPayload, sessionDays, sessionWeeks } from "../_lib/export-sessions";
 
 type Props = {
@@ -98,6 +99,8 @@ export default function DataScreen({ data, storageMessage, onExport, onImport }:
           <p className="empty-state">Cuando termines una sesión podrás copiarla o descargarla aquí.</p>
         )}
       </section>
+
+      <PushSettings data={data} />
 
       <section className="content-section" aria-labelledby="summary-title">
         <header className="section-bar">
