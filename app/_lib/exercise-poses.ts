@@ -1,14 +1,19 @@
 // Ángulos en grados. Flexión hacia adelante positiva.
-// armF: hombro adelante · armAb: hombro hacia el lado · elbow: codo · hipF: cadera adelante · hipAb: cadera hacia el lado · knee: rodilla
-export type Side = { armF?: number; armAb?: number; elbow?: number; hipF?: number; hipAb?: number; knee?: number };
+// armF: hombro adelante · armAb: hombro hacia el lado · elbow: codo · hipF: cadera adelante · hipAb: cadera hacia el lado · knee: rodilla · ankle: tobillo (positivo = puntas hacia abajo)
+export type Side = { armF?: number; armAb?: number; elbow?: number; hipF?: number; hipAb?: number; knee?: number; ankle?: number };
 export type Pose = Side & { y?: number; z?: number; rx?: number; torso?: number; l?: Side; r?: Side };
 export type ExerciseMotion = { a: Pose; b: Pose; seat?: boolean; speed?: number };
 
-export const STAND: Required<Omit<Pose, "l" | "r">> = { y: 0.9, z: 0, rx: 0, torso: 0, armF: 0, armAb: 0, elbow: 0, hipF: 0, hipAb: 0, knee: 0 };
+export const STAND: Required<Omit<Pose, "l" | "r">> = { y: 0.9, z: 0, rx: 0, torso: 0, armF: 0, armAb: 0, elbow: 0, hipF: 0, hipAb: 0, knee: 0, ankle: 0 };
 
 const SIT: Pose = { y: 0.5, hipF: 90, knee: 90 };
 
 export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
+  "calf-raise": {
+    a: { y: 0.9, armF: 55, elbow: 115, ankle: -8 },
+    b: { y: 0.99, armF: 55, elbow: 115, ankle: 42 },
+    speed: 0.8,
+  },
   "hip-thrust": {
     a: { y: 0.25, rx: -65, hipF: 70, knee: 100, armF: 20 },
     b: { y: 0.6, rx: -100, hipF: -5, knee: 90, armF: 20 },

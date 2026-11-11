@@ -5,7 +5,9 @@ import { type MouseEvent, useEffect, useRef } from "react";
 import { demoFor, EXERCISE_GEAR, isTechnogym } from "../_lib/exercise-gear";
 import { EXERCISE_MOTIONS } from "../_lib/exercise-poses";
 import { muscleLabel, musclesOf } from "../_lib/muscles";
+import { machineForExercise } from "../_lib/technogym";
 import type { RoutineExercise } from "../_lib/types";
+import MachineLinks from "./MachineLinks";
 
 const ExerciseModel3D = dynamic(() => import("./ExerciseModel3D"), { ssr: false, loading: () => <div className="exercise-model-3d" /> });
 
@@ -20,6 +22,7 @@ type Props = {
 export default function ExerciseSheet({ exercise, last, onClose }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const muscles = musclesOf(exercise);
+  const machine = machineForExercise(exercise.id);
   const demo = demoFor(exercise.id, EXERCISE_MOTIONS);
   const technogym = demo ? isTechnogym(EXERCISE_GEAR[demo.id] ?? {}) : false;
 
@@ -60,6 +63,13 @@ export default function ExerciseSheet({ exercise, last, onClose }: Props) {
         <div><dt>Última vez</dt><dd>{last ?? "Sin registro"}</dd></div>
       </dl>
       <p className="technique-text">{exercise.cue}</p>
+
+      {machine && (
+        <section aria-labelledby="sheet-machine" className="sheet-machine">
+          <h3 id="sheet-machine" className="list-title">Máquina · {machine.name}</h3>
+          <MachineLinks machine={machine} />
+        </section>
+      )}
     </dialog>
   );
 }

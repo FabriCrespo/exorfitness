@@ -20,7 +20,7 @@ export const CATALOG: CatalogExercise[] = [
   entry("cable-hip-abduction", "Abducción de cadera en polea", "Polea y tobillera", 2, "12–15 / lado", "gluteos", ["gluteos"], "Pelvis estable y movimiento lateral controlado. Descanso: 60 s."),
   entry("sumo-deadlift", "Peso muerto sumo", "Barra o mancuerna", 3, "8–10", "gluteos", ["gluteos", "isquios", "cuadriceps", "lumbar"], "Pies abiertos, pecho arriba y empuja el suelo. Descanso: 2 min."),
   entry("back-extension", "Extensión lumbar", "Banco de hiperextensión", 3, "10–12", "gluteos", ["lumbar", "gluteos", "isquios"], "Sube hasta alinear el cuerpo, sin hiperextender. Descanso: 90 s."),
-  entry("calf-raise", "Elevación de talones", "Máquina o escalón", 3, "12–15", "otro", ["gemelos"], "Recorrido completo y pausa arriba. Descanso: 60 s."),
+  entry("calf-raise", "Elevación de talones (pantorrillas)", "Máquina de pantorrillas Technogym", 3, "12–15", "otro", ["gemelos"], "Hombros bajo las almohadillas, rodillas casi rectas. Baja el talón hasta sentir el estiramiento, sube sobre la punta y pausa 1 s arriba. Descanso: 60 s."),
 
   // Espalda
   entry("t-bar-row", "Remo en barra T", "Barra T o landmine", 3, "8–12", "espalda", ["espalda", "trapecio", "biceps"], "Torso inclinado y estable, codos hacia atrás. Descanso: 90 s."),

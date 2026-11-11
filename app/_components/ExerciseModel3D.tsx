@@ -19,7 +19,7 @@ const THIGH = 0.45;
 const SHIN = 0.45;
 const rad = MathUtils.degToRad;
 
-type LimbRefs = { upper: Group | null; fore: Group | null; thigh: Group | null; shin: Group | null };
+type LimbRefs = { upper: Group | null; fore: Group | null; thigh: Group | null; shin: Group | null; foot: Group | null };
 type Part = "hips" | "thigh" | "shin" | "chest" | "abs" | "upper" | "fore" | "shoulder";
 
 const PARTS_BY_MUSCLE: Record<MuscleId, Part[]> = {
@@ -73,7 +73,7 @@ function blend(motion: ExerciseMotion, side: "l" | "r" | "root", key: keyof Pose
 function Figure({ motion, gear, still, phase, muscles }: { motion: ExerciseMotion; gear: Gear; still: boolean; phase?: number; muscles: MuscleId[] }) {
   const root = useRef<Group>(null);
   const torso = useRef<Group>(null);
-  const limbs = useRef<Record<"l" | "r", LimbRefs>>({ l: { upper: null, fore: null, thigh: null, shin: null }, r: { upper: null, fore: null, thigh: null, shin: null } });
+  const limbs = useRef<Record<"l" | "r", LimbRefs>>({ l: { upper: null, fore: null, thigh: null, shin: null, foot: null }, r: { upper: null, fore: null, thigh: null, shin: null, foot: null } });
   const handL = useRef<Group>(null);
   const handR = useRef<Group>(null);
   const clock = useRef(0);
@@ -98,6 +98,7 @@ function Figure({ motion, gear, still, phase, muscles }: { motion: ExerciseMotio
       if (g.fore) g.fore.rotation.x = rad(-v("elbow"));
       if (g.thigh) g.thigh.rotation.set(rad(-v("hipF")), 0, rad(sign * v("hipAb")));
       if (g.shin) g.shin.rotation.x = rad(v("knee"));
+      if (g.foot) g.foot.rotation.x = rad(v("ankle"));
     });
   });
 
@@ -129,7 +130,9 @@ function Figure({ motion, gear, still, phase, muscles }: { motion: ExerciseMotio
         <group position={[0, -THIGH, 0]} ref={(node) => { limbs.current[side].shin = node; }}>
           <Joint r={0.06} />
           <Limb length={SHIN} top={0.058} bottom={0.04} glow={on("shin")} />
-          <mesh position={[0, -SHIN, 0.06]} castShadow><boxGeometry args={[0.1, 0.06, 0.26]} /><meshStandardMaterial color="#e8eaee" roughness={0.35} metalness={0.3} /></mesh>
+          <group position={[0, -SHIN, 0]} ref={(node) => { limbs.current[side].foot = node; }}>
+            <mesh position={[0, 0, 0.06]} castShadow><boxGeometry args={[0.1, 0.06, 0.26]} /><meshStandardMaterial color="#e8eaee" roughness={0.35} metalness={0.3} /></mesh>
+          </group>
           {gear.pad === "shin-back" && <mesh position={[0, -SHIN + 0.1, -0.07]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.045, 0.045, 0.22, 16]} /><meshStandardMaterial color={PAD} roughness={0.8} /></mesh>}
           {gear.pad === "shin-front" && <mesh position={[0, -SHIN + 0.12, 0.07]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.045, 0.045, 0.22, 16]} /><meshStandardMaterial color={PAD} roughness={0.8} /></mesh>}
           {gear.frame === "legpress" && <mesh position={[0, -SHIN - 0.02, 0.1]} castShadow><boxGeometry args={[0.5, 0.04, 0.36]} /><Mat finish="chrome" /></mesh>}
@@ -151,6 +154,9 @@ function Figure({ motion, gear, still, phase, muscles }: { motion: ExerciseMotio
           <mesh position={[0, 0.59, 0]}><cylinderGeometry args={[0.04, 0.05, 0.1, 14]} /><Skin color={BODY} roughness={0.5} /></mesh>
           <mesh position={[0, 0.72, 0]} castShadow><sphereGeometry args={[0.105, 26, 26]} /><Skin color={BODY} roughness={0.45} /></mesh>
           <mesh position={[0, 0.725, 0.07]} scale={[1.1, 0.35, 0.6]}><sphereGeometry args={[0.1, 18, 18]} /><meshStandardMaterial color={GOLD} roughness={0.25} metalness={0.9} /></mesh>
+          {gear.pad === "shoulders" && [-1, 1].map((x) => (
+            <mesh key={x} position={[x * 0.14, 0.58, 0]} rotation={[0, 0, Math.PI / 2]} castShadow><capsuleGeometry args={[0.05, 0.1, 6, 14]} /><meshStandardMaterial color={PAD} roughness={0.8} /></mesh>
+          ))}
           {arm("l")}{arm("r")}
         </group>
         {gear.hold === "pelvisBar" && (

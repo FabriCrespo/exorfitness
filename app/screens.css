@@ -353,3 +353,24 @@ input[type="checkbox"][role="switch"]:checked::before { transform: translateX(17
 .sheet-facts { margin: 0 0 var(--space-3); display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
 .sheet-facts dt { color: var(--quiet); font-size: 11px; }
 .sheet-facts dd { margin: 2px 0 0; font-size: 14px; }
+
+/* Guía de máquinas Technogym */
+.machine-intro { margin: 0 0 var(--space-3); color: var(--quiet); font-size: 12px; }
+.machine-list details > summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); list-style: none; cursor: pointer; padding: 0; }
+.machine-list details > summary::-webkit-details-marker { display: none; }
+.machine-copy { display: grid; gap: 2px; min-width: 0; }
+.machine-copy strong { font-size: 14px; font-weight: 500; }
+.machine-copy small { color: var(--quiet); font-size: 11px; }
+.machine-list summary i { color: var(--quiet); font-style: normal; font-size: 18px; transition: transform .2s ease; }
+.machine-list details[open] summary i { transform: rotate(90deg); }
+.machine-list details.is-match .machine-copy strong { color: var(--accent); }
+.machine-links { display: grid; gap: var(--space-2); padding-top: var(--space-3); }
+.machine-links ul { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
+.machine-links a { display: flex; align-items: center; gap: var(--space-2); min-height: 40px; padding: var(--space-2) var(--space-3); border: 1px solid var(--separator); border-radius: 10px; color: var(--ink); font-size: 13px; text-decoration: none; }
+.machine-links a:hover, .machine-links a:focus-visible { border-color: var(--accent); }
+.machine-links a span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.machine-links a small { color: var(--quiet); font-size: 11px; }
+.machine-links a svg { width: 16px; height: 16px; flex: none; color: var(--accent); }
+.machine-links a i { color: var(--quiet); font-style: normal; font-size: 12px; }
+.machine-note { margin: 0; color: var(--muted); font-size: 12px; }
+.sheet-machine { margin-top: var(--space-3); }

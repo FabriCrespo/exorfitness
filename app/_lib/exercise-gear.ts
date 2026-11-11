@@ -1,7 +1,7 @@
 // Equipo que aparece en la demostración 3D de cada ejercicio (coordenadas del mundo: +z al frente, +y arriba).
-export type Frame = "seat" | "bench" | "incline" | "legpress" | "pullup" | "elliptical" | "rearBench";
+export type Frame = "seat" | "bench" | "incline" | "legpress" | "pullup" | "elliptical" | "rearBench" | "calf";
 export type Hold = "dumbbell" | "bar" | "pullbar" | "handle" | "rope" | "pelvisBar";
-export type Pad = "shin-back" | "shin-front" | "knee";
+export type Pad = "shin-back" | "shin-front" | "knee" | "shoulders";
 
 export type Gear = {
   frame?: Frame;
@@ -40,6 +40,7 @@ export const EXERCISE_GEAR: Record<string, Gear> = {
   "cable-pullover": { hold: "rope", cable: [0, 2.4, 0.95], tower: [0, 0.95] },
   "reverse-pec-deck": { frame: "seat", hold: "handle" },
   elliptical: { frame: "elliptical", hold: "handle" },
+  "calf-raise": { frame: "calf", pad: "shoulders" },
 };
 
 /** Ejercicios del catálogo que se demuestran con el movimiento de uno parecido (la demostración es aproximada). */
@@ -76,5 +77,5 @@ export function demoFor(exerciseId: string, motions: Record<string, unknown>) {
 
 /** Máquinas de la sala (asiento con pila, polea, prensa, elíptica): todas son Technogym en el gimnasio de Fabricio. */
 export function isTechnogym(gear: Gear) {
-  return Boolean(gear.tower || (gear.frame && ["seat", "legpress", "pullup", "elliptical"].includes(gear.frame)));
+  return Boolean(gear.tower || (gear.frame && ["seat", "legpress", "pullup", "elliptical", "calf"].includes(gear.frame)));
 }

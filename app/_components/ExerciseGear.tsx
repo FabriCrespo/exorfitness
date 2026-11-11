@@ -235,6 +235,20 @@ function Frames({ frame }: { frame: Frame }) {
       );
     case "rearBench":
       return <BenchFrame at={[0, 0.3, -0.7]} length={0.5} />;
+    case "calf":
+      // Standing Calf: plataforma para las puntas, columna trasera con la pila y palanca hasta los hombros.
+      return (
+        <group>
+          <Block position={[0, 0.06, 0.08]} size={[0.62, 0.12, 0.55]} finish="frame" />
+          <Block position={[0, 0.125, 0.3]} size={[0.62, 0.02, 0.06]} finish="chrome" radius={0.008} />
+          <Block position={[0, 0.03, -0.45]} size={[0.8, 0.06, 0.9]} finish="frame" />
+          <Post position={[-0.26, 0, -0.5]} height={1.6} />
+          <Post position={[0.26, 0, -0.5]} height={1.6} />
+          <Block position={[0, 1.62, -0.5]} size={[0.66, 0.1, 0.16]} finish="shroud" />
+          <Block position={[0, 1.4, -0.28]} size={[0.12, 0.12, 0.5]} finish="shroud" />
+          <WeightStack position={[0, 0.05, -0.78]} plates={8} pin={3} />
+        </group>
+      );
   }
 }
 

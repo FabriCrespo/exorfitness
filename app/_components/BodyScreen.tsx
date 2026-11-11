@@ -1,26 +1,29 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { exercisePool } from "../_lib/similar";
 import { agoLabel, exercisesFor, lastWorked, type MuscleId, MUSCLES, muscleLabel } from "../_lib/muscles";
 import type { AppData, RoutineExercise } from "../_lib/types";
 import { daysAgo, formatNumber } from "../_lib/workout-data";
 import BodyMap, { type BodyView } from "./BodyMap";
 import ExerciseSheet from "./ExerciseSheet";
+import MachineGuide from "./MachineGuide";
 
 type Props = {
   data: AppData;
-  library: RoutineExercise[];
   onStartCustom: (exercises: RoutineExercise[], title: string) => void;
 };
 
 const MAX_DEFAULT = 6;
 
-export default function BodyScreen({ data, library, onStartCustom }: Props) {
+export default function BodyScreen({ data, onStartCustom }: Props) {
   const [view, setView] = useState<BodyView>("front");
   const [selected, setSelected] = useState<Set<MuscleId>>(new Set());
   const [open, setOpen] = useState<RoutineExercise | null>(null);
   const worked = useMemo(() => lastWorked(data.sessions), [data.sessions]);
-  const matches = useMemo(() => exercisesFor(library, selected), [library, selected]);
+  // Tu rutina más el catálogo: así cada músculo tiene opciones, aunque hoy no lo entrenes.
+  const pool = useMemo(() => exercisePool(data.days).map((item) => item.exercise), [data.days]);
+  const matches = useMemo(() => exercisesFor(pool, selected), [pool, selected]);
   const hasActive = Boolean(data.activeSession);
 
   const chosen = matches.slice(0, MAX_DEFAULT);
@@ -101,6 +104,8 @@ export default function BodyScreen({ data, library, onStartCustom }: Props) {
           </ol>
         )}
       </section>
+
+      <MachineGuide selected={selected} />
 
       {selected.size > 0 && chosen.length > 0 && !hasActive && (
         <button className="text-button block" onClick={() => onStartCustom(chosen.map((item) => item.exercise), titleFor())}>

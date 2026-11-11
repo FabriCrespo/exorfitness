@@ -65,7 +65,7 @@ export default function Home() {
             onSetExtraCardio={workout.setExtraCardio}
           />
         )}
-        {tab === "body" && <BodyScreen data={data} library={library} onStartCustom={(exercises, title) => { workout.startCustomWorkout(exercises, title); setTab("routine"); }} />}
+        {tab === "body" && <BodyScreen data={data} onStartCustom={(exercises, title) => { workout.startCustomWorkout(exercises, title); setTab("routine"); }} />}
         {tab === "progress" && <ProgressScreen data={data} stats={stats} onAddMeasurement={workout.addMeasurement} onUpdateSession={workout.updateSession} onDeleteSession={workout.deleteSession} />}
         {tab === "data" && <DataScreen data={data} storageMessage={workout.storageMessage} onExport={workout.exportData} onImport={workout.importData} />}
       </main>
