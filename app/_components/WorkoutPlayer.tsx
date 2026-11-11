@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import type { ActiveExercise, LoggedExercise, RoutineExercise, SetEntry, WorkoutSession } from "../_lib/types";
+import { suggestSets } from "../_lib/suggestions";
 import { restSecondsFor, useElapsed } from "../_lib/use-elapsed";
 import { daysAgo, formatDate, formatNumber, volumeOf } from "../_lib/workout-data";
 import CardioProtocol from "./CardioProtocol";
@@ -77,6 +78,9 @@ export default function WorkoutPlayer({ exercise, activeExercise, index, total, 
     onSaveSet(setId);
     if (!isTimed && upcoming.length > 0) setRestSeconds(restSecondsFor(exercise.cue));
   };
+  const { sets: suggested, reason } = suggestSets(exercise, previous?.sets, sets.length);
+  const hint = !isTimed && currentIndex >= 0 ? suggested[currentIndex] : undefined;
+  const hintApplied = hint && current && Number(current.weightKg) === hint.weightKg && Number(current.reps) === hint.reps;
   const savedSets = isTimed ? [] : finished.map((set) => ({ weightKg: Number(set.weightKg) || 0, reps: Number(set.reps) || 0, toFailure: set.toFailure }));
 
   return (
@@ -108,6 +112,12 @@ export default function WorkoutPlayer({ exercise, activeExercise, index, total, 
                 <h2 id="current-set-title">{isTimed ? "Bloque de cardio" : `Serie ${currentIndex + 1} de ${sets.length}`}</h2>
                 <p>{isTimed ? exercise.targetReps : `Objetivo ${exercise.targetReps} · deja 2–3 en reserva`}</p>
               </header>
+              {hint && (
+                <p className="set-hint">
+                  <span>Sugerido: <b>{hint.weightKg} kg × {hint.reps}</b><br />{reason}</span>
+                  {!hintApplied && <button type="button" onClick={() => onUpdateSet(current.id, { weightKg: String(hint.weightKg), reps: String(hint.reps) })}>Usar</button>}
+                </p>
+              )}
               {isTimed ? (
                 <Stepper label="Minutos" unit="min" step={5} min={0} value={current.durationMinutes ?? ""} onChange={(value) => onUpdateSet(current.id, { durationMinutes: value })} />
               ) : (

@@ -21,6 +21,11 @@ export default function HomeScreen({ data, stats, onSelectDay, onOpenRoutine }: 
   const { selectedDay } = stats;
   const isToday = data.selectedDay === currentDayIndex();
   const hasActiveSession = Boolean(data.activeSession);
+  const selectedIsMissed = stats.isMissed(data.selectedDay);
+  // Hoy es un día de entreno que aún no hiciste y te quedaron días pendientes: ofrece retomarlos.
+  const todayIndex = stats.todayRank;
+  const canChoose = !hasActiveSession && stats.missedDays.length > 0 && todayIndex <= 5 && !stats.isDayDone(todayIndex);
+  const choose = (index: number) => { onSelectDay(index); onOpenRoutine(); };
 
   return (
     <article className="page-content home-screen" aria-labelledby="page-title">
@@ -35,12 +40,27 @@ export default function HomeScreen({ data, stats, onSelectDay, onOpenRoutine }: 
           <h2 id="week-title">Tu semana</h2>
           <p>{stats.fixedDaysDone} de {stats.trainingDayCount} días</p>
         </header>
-        <WeekSelector days={data.days} selectedIndex={data.selectedDay} isComplete={stats.isDayDone} onSelect={onSelectDay} />
+        <WeekSelector days={data.days} selectedIndex={data.selectedDay} isComplete={stats.isDayDone} isMissed={stats.isMissed} onSelect={onSelectDay} />
       </section>
+
+      {canChoose && (
+        <section className="card recover-card" aria-labelledby="recover-title">
+          <header>
+            <h2 id="recover-title" className="list-title">¿Qué quieres hacer hoy?</h2>
+            <p>Te quedaron días sin registrar esta semana. Elige una rutina.</p>
+          </header>
+          <ul className="recover-list">
+            <li><button className="is-primary" onClick={() => choose(todayIndex)}><span>La de hoy<small>{data.days[todayIndex].label} · {data.days[todayIndex].focus}</small></span><i aria-hidden="true">›</i></button></li>
+            {stats.missedDays.map((index) => (
+              <li key={index}><button onClick={() => choose(index)}><span>Retomar {data.days[index].label}<small>{data.days[index].focus}</small></span><i aria-hidden="true">›</i></button></li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <button className="today-card" onClick={onOpenRoutine}>
         <svg className="today-card-mountain" viewBox="0 0 200 80" aria-hidden="true"><path d="M0 80 70 26l14 10 20-24 14 18 18-10 64 60z" fill="currentColor" opacity=".22" /><circle cx="150" cy="22" r="9" fill="currentColor" opacity=".3" /></svg>
-        <span className="today-card-label">{hasActiveSession ? "SESIÓN EN CURSO" : isToday ? "HOY TOCA" : selectedDay.label.toUpperCase()}</span>
+        <span className="today-card-label">{hasActiveSession ? "SESIÓN EN CURSO" : selectedIsMissed ? `${selectedDay.label.toUpperCase()} · NO REGISTRADO` : isToday ? "HOY TOCA" : selectedDay.label.toUpperCase()}</span>
         <strong>{selectedDay.focus}</strong>
         <span className="today-card-meta">
           {selectedDay.exercises.length} {selectedDay.exercises.length === 1 ? "ejercicio" : "ejercicios"} · ~{estimateMinutes(selectedDay)} min

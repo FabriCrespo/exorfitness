@@ -15,7 +15,7 @@ type Props = {
   onBack: () => void;
   onAddExercise: () => void;
   onRemoveExercise: (exerciseId: string) => void;
-  onStart: () => void;
+  onStart: (date?: string) => void;
   onFinish: () => void;
   onCancel: () => void;
   onUpdateSet: (exerciseId: string, setId: string, patch: Partial<SetEntry>) => void;
@@ -28,6 +28,11 @@ type Props = {
 const isExerciseDone = (exercise?: ActiveExercise) =>
   Boolean(exercise && (exercise.done || (exercise.sets.length > 0 && exercise.sets.every((set) => set.complete))));
 
+const todayKey = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
+
 export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onSetNotes, onCompleteExercise, onSetExtraCardio }: Props) {
   const { selectedDay, activeSession, isCardioDay, newestFirst } = stats;
   const exercises = selectedDay.exercises;
@@ -35,6 +40,7 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
 
   // Si ya hay una sesión en curso (por ejemplo al volver a abrir la app), retoma en el primer ejercicio pendiente.
   const [showIntro, setShowIntro] = useState(false);
+  const [sessionDate, setSessionDate] = useState(() => todayKey());
   const endIntro = useCallback(() => setShowIntro(false), []);
   const [openId, setOpenId] = useState<string | null>(() =>
     activeSession ? exercises.find((exercise) => !isExerciseDone(activeSession.exercises.find((item) => item.exerciseId === exercise.id)))?.id ?? null : null,
@@ -65,7 +71,7 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
   };
 
   const start = () => {
-    onStart();
+    onStart(sessionDate);
     setOpenId(exercises[0]?.id ?? null);
     setShowIntro(true);
   };
@@ -151,6 +157,13 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
             return <RoutineExerciseRow key={`${exercise.id}-${index}`} exercise={exercise} index={index} status={status} onOpen={() => setOpenId(exercise.id)} />;
           })}
         </ol>
+      )}
+
+      {!activeSession && total > 0 && (
+        <label className="card session-date">
+          <span>¿Cuándo lo hiciste?<small>Cambia la fecha si lo vas a registrar de otro día.</small></span>
+          <input type="date" value={sessionDate} max={todayKey()} onChange={(event) => setSessionDate(event.target.value || todayKey())} />
+        </label>
       )}
 
       {activeSession && !isCardioDay && (

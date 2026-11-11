@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useMemo, useState } from "react";
-import type { AppData, Measurement, WorkoutSession } from "../_lib/types";
+import type { AppData, Measurement, RoutineExercise, WorkoutSession } from "../_lib/types";
 import type { WorkoutStats } from "../_lib/workout-stats";
 import { formatDate, formatNumber } from "../_lib/workout-data";
 import ActivityRings from "./ActivityRings";
@@ -62,6 +62,11 @@ function MeasurementForm({ onAdd }: { onAdd: (area: string, value: number) => vo
 export default function ProgressScreen({ data, stats, onAddMeasurement, onUpdateSession, onDeleteSession }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const editing = data.sessions.find((item) => item.id === editingId);
+  const library = useMemo(() => {
+    const known = new Map<string, RoutineExercise>();
+    for (const day of data.days) for (const exercise of day.exercises) if (!known.has(exercise.id)) known.set(exercise.id, exercise);
+    return [...known.values()];
+  }, [data.days]);
   const { sessions, days } = data;
   const volumes = [...stats.recentSessions].reverse();
   const measurementsByArea = useMemo(() => groupByArea(data.measurements), [data.measurements]);
@@ -141,6 +146,7 @@ export default function ProgressScreen({ data, stats, onAddMeasurement, onUpdate
         <SessionEditor
           key={editing.id}
           session={editing}
+          library={library}
           dayTitle={`${days[editing.dayIndex]?.label ?? "Sesión"} · ${days[editing.dayIndex]?.focus ?? ""}`}
           onClose={() => setEditingId(null)}
           onSave={onUpdateSession}

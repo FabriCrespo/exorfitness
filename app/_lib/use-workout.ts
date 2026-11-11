@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ActiveSession, AppData, LoggedExercise, SetEntry, Theme, WorkoutSession } from "./types";
+import type { ActiveSession, AppData, LoggedExercise, RoutineExercise, SetEntry, Theme, WorkoutSession } from "./types";
+import { suggestSets } from "./suggestions";
 import { isExternalWorkout, sessionFromExternal, blankSets, currentDayIndex, defaultData, isAppData, makeId, normalizeData, planExercise, startOfLocalWeek, STORAGE_KEY, THEME_KEY, volumeOf } from "./workout-data";
 
 const BACKUP_KEY = `${STORAGE_KEY}:backup`;
@@ -101,49 +102,64 @@ export function useWorkout() {
     setData((current) => ({ ...current, selectedDay: index }));
   };
 
-  const addExercise = (name: string, equipment: string) => {
-    const exercise = planExercise(makeId(), name, equipment || "Por elegir", 3, "8–12", "Anota una pista que te ayude a repetir el movimiento.");
-    setData((current) => ({
-      ...current,
-      days: current.days.map((day, index) => (index === current.selectedDay ? { ...day, exercises: [...day.exercises, exercise] } : day)),
-      activeSession: current.activeSession?.dayIndex === current.selectedDay
-        ? { ...current.activeSession, exercises: [...current.activeSession.exercises, { exerciseId: exercise.id, sets: [] }] }
-        : current.activeSession,
-    }));
+  /** Series de un ejercicio, ya con la carga sugerida según la última vez que lo hiciste. */
+  const buildSets = (exercise: RoutineExercise) => {
+    if (exercise.trackingMode === "minutes") return blankSets(1);
+    const previous = [...data.sessions].reverse().flatMap((item) => item.exercises).find((item) => item.exerciseId === exercise.id)?.sets;
+    const { sets: suggested } = suggestSets(exercise, previous, exercise.targetSets);
+    return blankSets(exercise.targetSets).map((set, index) => {
+      const hint = suggested[index];
+      return hint ? { ...set, weightKg: String(hint.weightKg), reps: String(hint.reps) } : set;
+    });
+  };
+
+  /** `persist`: guardar también en la rutina del día. Con una sesión abierta, por defecto solo cuenta para esa sesión. */
+  const addExercise = (choice: { name: string; equipment: string; source?: RoutineExercise; persist: boolean }) => {
+    const base = choice.source ?? planExercise(makeId(), choice.name, choice.equipment || "Por elegir", 3, "8–12", "Anota una pista que te ayude a repetir el movimiento.");
+    const exercise: RoutineExercise = { ...base, targetSets: base.targetSets || 3 };
+    const entry = { exerciseId: exercise.id, sets: buildSets(exercise) };
+    setData((current) => {
+      const session = current.activeSession?.dayIndex === current.selectedDay ? current.activeSession : null;
+      const day = current.days[current.selectedDay];
+      const already = day.exercises.some((item) => item.id === exercise.id) || session?.extras?.some((item) => item.id === exercise.id) || session?.exercises.some((item) => item.exerciseId === exercise.id);
+      if (already) return current;
+      const persist = choice.persist || !session;
+      return {
+        ...current,
+        days: persist ? current.days.map((item, index) => (index === current.selectedDay ? { ...item, exercises: [...item.exercises, exercise] } : item)) : current.days,
+        activeSession: session
+          ? { ...session, exercises: [...session.exercises, entry], extras: persist ? session.extras : [...(session.extras ?? []), exercise] }
+          : current.activeSession,
+      };
+    });
   };
 
   const removeExercise = (exerciseId: string) => {
     const day = data.days[data.selectedDay];
-    const exercise = day?.exercises.find((item) => item.id === exerciseId);
-    if (!exercise || !confirmAction(`¿Quitar “${exercise.name}” de ${day.label}?`)) return;
+    const extra = data.activeSession?.extras?.find((item) => item.id === exerciseId);
+    const exercise = day?.exercises.find((item) => item.id === exerciseId) ?? extra;
+    if (!exercise || !confirmAction(extra ? `¿Quitar “${exercise.name}” de esta sesión?` : `¿Quitar “${exercise.name}” de ${day.label}?`)) return;
     setData((current) => ({
       ...current,
       days: current.days.map((item, index) => (index === current.selectedDay ? { ...item, exercises: item.exercises.filter((entry) => entry.id !== exerciseId) } : item)),
       activeSession: current.activeSession?.dayIndex === current.selectedDay
-        ? { ...current.activeSession, exercises: current.activeSession.exercises.filter((item) => item.exerciseId !== exerciseId) }
+        ? { ...current.activeSession, exercises: current.activeSession.exercises.filter((item) => item.exerciseId !== exerciseId), extras: current.activeSession.extras?.filter((item) => item.id !== exerciseId) }
         : current.activeSession,
     }));
   };
 
-  const startWorkout = () => {
+  /** `date` (AAAA-MM-DD) sirve para registrar un entreno de otro día; sin ella cuenta como hoy. */
+  const startWorkout = (date?: string) => {
     const day = data.days[data.selectedDay];
     if (data.activeSession || !day?.exercises.length) return;
-    const lastSets = (exerciseId: string) =>
-      [...data.sessions].reverse().flatMap((item) => item.exercises).find((exercise) => exercise.exerciseId === exerciseId)?.sets ?? [];
+    const today = new Date();
+    const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
     const session: ActiveSession = {
       id: makeId(),
       dayIndex: data.selectedDay,
       startedAt: new Date().toISOString(),
-      exercises: day.exercises.map((exercise) => {
-        if (exercise.trackingMode === "minutes") return { exerciseId: exercise.id, sets: blankSets(1) };
-        // Series ya preparadas; si ya hiciste el ejercicio, arrancan con el peso de la última vez.
-        const previous = lastSets(exercise.id);
-        const sets = blankSets(exercise.targetSets).map((set, index) => {
-          const before = previous[index] ?? previous.at(-1);
-          return before ? { ...set, weightKg: String(before.weightKg || ""), reps: String(before.reps || "") } : set;
-        });
-        return { exerciseId: exercise.id, sets };
-      }),
+      ...(date && date !== todayKey ? { date } : {}),
+      exercises: day.exercises.map((exercise) => ({ exerciseId: exercise.id, sets: buildSets(exercise) })),
     };
     setData((current) => ({ ...current, activeSession: session }));
   };
@@ -194,7 +210,7 @@ export function useWorkout() {
     const session = data.activeSession;
     if (!session) return;
     const exercises: LoggedExercise[] = session.exercises.flatMap((activeExercise) => {
-      const definition = data.days[session.dayIndex]?.exercises.find((exercise) => exercise.id === activeExercise.exerciseId);
+      const definition = [...(data.days[session.dayIndex]?.exercises ?? []), ...(session.extras ?? [])].find((exercise) => exercise.id === activeExercise.exerciseId);
       if (!definition) return [];
       const sets = activeExercise.sets.filter((set) => set.complete).map((set) => ({
         weightKg: Number(set.weightKg) || 0,
@@ -207,11 +223,19 @@ export function useWorkout() {
     const extraCardio = Number(session.extraCardioMinutes) || 0;
     if (extraCardio > 0) exercises.push({ exerciseId: "cardio-extra", name: "Cardio al final", group: "cardio", sets: [{ weightKg: 0, reps: 0, durationMinutes: extraCardio, toFailure: false }] });
     if (exercises.length === 0) return;
+    // Un entreno de otro día conserva la hora actual pero cae en la fecha elegida.
+    const moveToDate = (iso: string) => {
+      if (!session.date) return iso;
+      const [year, month, day] = session.date.split("-").map(Number);
+      const moved = new Date(iso);
+      moved.setFullYear(year, month - 1, day);
+      return moved.toISOString();
+    };
     const finished = {
       id: session.id,
       dayIndex: session.dayIndex,
-      startedAt: session.startedAt,
-      finishedAt: new Date().toISOString(),
+      startedAt: moveToDate(session.startedAt),
+      finishedAt: moveToDate(new Date().toISOString()),
       exercises,
       volume: exercises.reduce((total, exercise) => total + volumeOf(exercise.sets), 0),
       cardioMinutes: exercises.flatMap((exercise) => exercise.sets).reduce((total, set) => total + (set.durationMinutes ?? 0), 0),

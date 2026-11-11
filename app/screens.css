@@ -266,3 +266,34 @@ input[type="checkbox"][role="switch"]:checked::before { transform: translateX(17
 .editor-set-number { color: var(--quiet); font-size: 11px; text-align: center; }
 .editor-remove { width: 28px; height: 28px; border: 1px solid var(--separator); border-radius: 50%; background: transparent; color: var(--muted); cursor: pointer; }
 .editor-delete { min-height: 40px; border: 0; background: transparent; font-size: 13px; cursor: pointer; }
+
+/* Días sin registro */
+.day-mark.is-missed { background: var(--bad); }
+.day-tab.is-selected .day-mark.is-missed { background: var(--button-ink); }
+.recover-card { display: grid; gap: var(--space-2); }
+.recover-card header p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+.recover-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
+.recover-list button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 46px; padding: var(--space-2) var(--space-3); border: 1px solid var(--separator); border-radius: 12px; background: transparent; color: var(--ink); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.recover-list button.is-primary { border-color: var(--accent); }
+.recover-list small { display: block; color: var(--quiet); font-size: 11px; }
+.recover-list i { color: var(--quiet); font-style: normal; font-size: 18px; }
+.session-date { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.session-date span { color: var(--muted); font-size: 12px; }
+.session-date small { display: block; color: var(--quiet); font-size: 11px; }
+.session-date input { height: 38px; padding: 0 var(--space-3); border: 1px solid var(--separator); border-radius: 10px; background: var(--input-surface); color: var(--ink); font-size: 14px; }
+.set-hint { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin: 0; padding: var(--space-2) var(--space-3); border: 1px dashed var(--separator); border-radius: 10px; color: var(--muted); font-size: 12px; }
+.set-hint b { color: var(--accent); font-weight: 500; }
+.set-hint button { flex: none; min-height: 30px; padding: 0 var(--space-3); border: 1px solid var(--accent); border-radius: 9px; background: transparent; color: var(--accent); font-size: 12px; cursor: pointer; }
+.library-pick { display: grid; gap: var(--space-1); }
+.library-pick select { width: 100%; height: 38px; padding: 0 var(--space-3); border: 1px solid var(--separator); border-radius: 10px; background: var(--input-surface); color: var(--ink); font-size: 14px; }
+.check-row { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--muted); font-size: 12px; }
+.check-row input { margin-top: 2px; }
+
+.editor-add { min-height: 34px; border: 1px dashed var(--separator); border-radius: 10px; background: transparent; color: var(--accent); font-size: 12px; cursor: pointer; }
+.editor-new select { width: 100%; height: 38px; padding: 0 var(--space-3); border: 1px solid var(--separator); border-radius: 10px; background: var(--input-surface); color: var(--ink); font-size: 14px; }
+
+/* Notificaciones */
+.push-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
+.push-list .switch-row span { display: grid; gap: 2px; }
+.push-list small { color: var(--quiet); font-size: 11px; }
+.push-time input { width: 100%; }

@@ -1,12 +1,13 @@
 "use client";
 
 import { type FormEvent, type MouseEvent, useEffect, useRef, useState } from "react";
-import type { LoggedExercise, WorkoutSession } from "../_lib/types";
+import type { LoggedExercise, RoutineExercise, WorkoutSession } from "../_lib/types";
 import { volumeOf } from "../_lib/workout-data";
 
 type Props = {
   session: WorkoutSession;
   dayTitle: string;
+  library: RoutineExercise[];
   onClose: () => void;
   onSave: (session: WorkoutSession) => void;
   onDelete: (sessionId: string) => void;
@@ -20,15 +21,18 @@ const localDate = (iso: string) => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 };
 
-export default function SessionEditor({ session, dayTitle, onClose, onSave, onDelete }: Props) {
+export default function SessionEditor({ session, dayTitle, library, onClose, onSave, onDelete }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
-  const strength = session.exercises.filter((exercise) => exercise.exerciseId !== EXTRA_CARDIO_ID);
+  const initial = session.exercises.filter((exercise) => exercise.exerciseId !== EXTRA_CARDIO_ID);
+  const [strength, setStrength] = useState<LoggedExercise[]>(initial);
+  const [pick, setPick] = useState("");
+  const [customName, setCustomName] = useState("");
   const extra = session.exercises.find((exercise) => exercise.exerciseId === EXTRA_CARDIO_ID);
 
   const [date, setDate] = useState(localDate(session.finishedAt));
   const [cardio, setCardio] = useState(String(extra?.sets.reduce((sum, set) => sum + (set.durationMinutes ?? 0), 0) || ""));
   const [drafts, setDrafts] = useState<DraftSet[][]>(() =>
-    strength.map((exercise) => exercise.sets.map((set) => ({
+    initial.map((exercise) => exercise.sets.map((set) => ({
       weightKg: String(set.weightKg), reps: String(set.reps), durationMinutes: String(set.durationMinutes ?? ""), toFailure: set.toFailure, timed: set.durationMinutes !== undefined,
     }))),
   );
@@ -43,6 +47,23 @@ export default function SessionEditor({ session, dayTitle, onClose, onSave, onDe
 
   const patch = (exerciseIndex: number, setIndex: number, change: Partial<DraftSet>) =>
     setDrafts((current) => current.map((sets, i) => (i !== exerciseIndex ? sets : sets.map((set, j) => (j === setIndex ? { ...set, ...change } : set)))));
+
+  const blankDraft = (timed: boolean): DraftSet => ({ weightKg: "", reps: "", durationMinutes: "", toFailure: false, timed });
+
+  const addSet = (exerciseIndex: number) =>
+    setDrafts((current) => current.map((sets, i) => (i !== exerciseIndex ? sets : [...sets, { ...(sets.at(-1) ?? blankDraft(false)), toFailure: false }])));
+
+  const addExercise = () => {
+    const known = library.find((item) => item.id === pick);
+    const name = (known?.name ?? customName).trim();
+    if (!name) return;
+    const timed = known?.trackingMode === "minutes";
+    const exercise: LoggedExercise = { exerciseId: known?.id ?? `libre-${Date.now()}`, name, group: known?.group ?? "otro", sets: [] };
+    setStrength((current) => [...current, exercise]);
+    setDrafts((current) => [...current, [blankDraft(timed)]]);
+    setPick("");
+    setCustomName("");
+  };
 
   const removeSet = (exerciseIndex: number, setIndex: number) =>
     setDrafts((current) => current.map((sets, i) => (i !== exerciseIndex ? sets : sets.filter((_, j) => j !== setIndex))));
@@ -133,8 +154,21 @@ export default function SessionEditor({ session, dayTitle, onClose, onSave, onDe
                 <button type="button" className="editor-remove" onClick={() => removeSet(exerciseIndex, setIndex)} aria-label={`Quitar serie ${setIndex + 1}`}>×</button>
               </div>
             ))}
+            <button type="button" className="editor-add" onClick={() => addSet(exerciseIndex)}>+ Añadir serie</button>
           </fieldset>
         ))}
+
+        <fieldset className="editor-new">
+          <legend>Añadir ejercicio</legend>
+          {library.length > 0 && (
+            <select value={pick} onChange={(event) => setPick(event.target.value)} aria-label="Elegir ejercicio conocido">
+              <option value="">Otro (escribe el nombre)…</option>
+              {library.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </select>
+          )}
+          {!pick && <input value={customName} onChange={(event) => setCustomName(event.target.value)} placeholder="Nombre del ejercicio" maxLength={60} aria-label="Nombre del ejercicio" />}
+          <button type="button" className="editor-add" onClick={addExercise}>Añadir al registro</button>
+        </fieldset>
 
         <button className="primary-button" type="submit">Guardar cambios</button>
         <button className="danger editor-delete" type="button" onClick={remove}>Borrar sesión</button>

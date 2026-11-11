@@ -26,8 +26,10 @@ function comparableVolumeOf(data: AppData, newestFirst: WorkoutSession[]) {
 }
 
 export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
-  const selectedDay = data.days[data.selectedDay] ?? data.days[0];
+  const baseDay = data.days[data.selectedDay] ?? data.days[0];
   const activeSession = data.activeSession?.dayIndex === data.selectedDay ? data.activeSession : null;
+  // Los ejercicios añadidos solo a la sesión en curso se muestran junto a los del día.
+  const selectedDay = activeSession?.extras?.length ? { ...baseDay, exercises: [...baseDay.exercises, ...activeSession.extras] } : baseDay;
   const newestFirst = [...data.sessions].reverse();
   const [lastDaySession, previousDaySession] = newestFirst.filter((session) => session.dayIndex === data.selectedDay);
 
@@ -48,6 +50,10 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
   const sessionsThisWeek = weekStart ? data.sessions.filter((session) => new Date(session.finishedAt) >= weekStart) : [];
   const doneDays = new Set(sessionsThisWeek.map((session) => session.dayIndex));
   const fixedDays = data.days.filter((day) => !day.flexible);
+  // Lunes = 0 … domingo = 6. Un día fijo anterior a hoy, sin sesión esta semana, cuenta como "no fui".
+  const todayRank = (new Date().getDay() + 6) % 7;
+  const isMissed = (index: number) => Boolean(weekStart) && !data.days[index]?.flexible && index < todayRank && !doneDays.has(index);
+  const missedDays = data.days.map((_, index) => index).filter(isMissed);
 
   const groupGoal = (label: string, group: Group) => {
     const planned = data.days.map((day, index) => ({ day, index })).filter(({ day }) => !day.flexible && day.exercises.some((exercise) => exercise.group === group));
@@ -86,6 +92,9 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
     trainingDayCount: fixedDays.length,
     fixedDaysDone: data.days.filter((day, index) => !day.flexible && doneDays.has(index)).length,
     isDayDone: (index: number) => doneDays.has(index),
+    isMissed,
+    missedDays,
+    todayRank,
   };
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import AppHeader from "./_components/AppHeader";
 import AppNavigation from "./_components/AppNavigation";
 import DataScreen from "./_components/DataScreen";
@@ -8,7 +8,7 @@ import ExerciseDialog from "./_components/ExerciseDialog";
 import HomeScreen from "./_components/HomeScreen";
 import ProgressScreen from "./_components/ProgressScreen";
 import RoutineScreen from "./_components/RoutineScreen";
-import type { Tab } from "./_lib/types";
+import type { RoutineExercise, Tab } from "./_lib/types";
 import { useWorkout } from "./_lib/use-workout";
 import { deriveWorkoutStats } from "./_lib/workout-stats";
 
@@ -16,6 +16,12 @@ export default function Home() {
   const workout = useWorkout();
   const [tab, setTab] = useState<Tab>("home");
   const [isAddingExercise, setIsAddingExercise] = useState(false);
+  // Todos los ejercicios conocidos, sin repetir, para poder reutilizarlos en cualquier día.
+  const library = useMemo(() => {
+    const known = new Map<string, RoutineExercise>();
+    for (const day of workout.data.days) for (const exercise of day.exercises) if (!known.has(exercise.id)) known.set(exercise.id, exercise);
+    return [...known.values()];
+  }, [workout.data.days]);
 
   if (!workout.hydrated) {
     return (
@@ -67,7 +73,9 @@ export default function Home() {
         <ExerciseDialog
           dayLabel={stats.selectedDay.label}
           onClose={() => setIsAddingExercise(false)}
-          onSubmit={(name, equipment) => workout.addExercise(name, equipment)}
+          library={library}
+          sessionActive={stats.activeSession !== null}
+          onSubmit={workout.addExercise}
         />
       )}
       <p className="sr-only" aria-live="polite">{workout.storageMessage}</p>
