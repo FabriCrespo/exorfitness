@@ -320,9 +320,36 @@ input[type="checkbox"][role="switch"]:checked::before { transform: translateX(17
 .muscle-chips small { color: var(--quiet); font-size: 10px; }
 .muscle-chips button.is-active { background: var(--accent); border-color: var(--accent); color: var(--button-ink); }
 .muscle-chips button.is-active small { color: var(--button-ink); opacity: .75; }
-.match-row { display: flex; align-items: flex-start; gap: var(--space-3); width: 100%; cursor: pointer; }
-.match-row input { margin-top: 3px; accent-color: var(--accent); }
+.match-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.match-row i { color: var(--quiet); font-style: normal; font-size: 18px; }
 .match-copy { display: grid; gap: 2px; min-width: 0; }
 .match-copy strong { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
 .match-copy small { color: var(--quiet); font-size: 11px; }
 .body-screen { padding-bottom: var(--space-4); }
+
+/* Ejercicios similares */
+.similar-dialog { max-height: calc(100dvh - 32px); overflow: auto; }
+.similar-dialog .check-row { margin-bottom: var(--space-3); }
+.similar-dialog .modal-hint { margin-bottom: var(--space-3); }
+.similar-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
+.similar-list button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-3); border: 1px solid var(--separator); border-radius: 12px; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.similar-list button:hover { border-color: var(--accent); }
+.similar-copy { display: grid; gap: 2px; min-width: 0; }
+.similar-copy strong { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.similar-copy small { color: var(--quiet); font-size: 11px; }
+.similar-list i { color: var(--quiet); font-style: normal; font-size: 18px; }
+
+.exercise-model-3d.is-interactive { cursor: grab; touch-action: pan-y; }
+.exercise-model-3d.is-interactive:active { cursor: grabbing; }
+
+/* Ficha de ejercicio */
+.exercise-sheet { max-height: calc(100dvh - 24px); overflow: auto; display: block; }
+.exercise-sheet .exercise-model-3d { margin: 0 calc(var(--space-2) * -1) var(--space-2); border-radius: 14px; overflow: hidden; }
+.sheet-note { margin: 0 0 var(--space-3); color: var(--quiet); font-size: 11px; text-align: center; }
+.sheet-tags { margin: 0 0 var(--space-3); padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.sheet-tags li { padding: 3px var(--space-3); border: 1px solid var(--separator); border-radius: 999px; color: var(--muted); font-size: 11px; }
+.sheet-tags li.is-primary { border-color: var(--accent); color: var(--accent); }
+.sheet-tags li.is-brand { border-color: var(--ink); color: var(--ink); letter-spacing: .16em; text-transform: uppercase; font-size: 10px; }
+.sheet-facts { margin: 0 0 var(--space-3); display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.sheet-facts dt { color: var(--quiet); font-size: 11px; }
+.sheet-facts dd { margin: 2px 0 0; font-size: 14px; }

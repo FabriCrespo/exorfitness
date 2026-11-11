@@ -1,3 +1,4 @@
+import { CATALOG_BY_ID } from "./exercise-catalog";
 import type { Group, RoutineExercise, WorkoutSession } from "./types";
 import { daysAgo } from "./workout-data";
 
@@ -55,7 +56,7 @@ const BY_GROUP: Partial<Record<Group, MuscleId[]>> = {
 /** Músculos que trabaja un ejercicio: tabla conocida o, para los que añadiste tú, su grupo. */
 export function musclesOf(exercise: { id?: string; exerciseId?: string; group: Group }): MuscleId[] {
   const id = exercise.id ?? exercise.exerciseId ?? "";
-  return BY_EXERCISE[id] ?? BY_GROUP[exercise.group] ?? [];
+  return BY_EXERCISE[id] ?? CATALOG_BY_ID.get(id)?.muscles ?? BY_GROUP[exercise.group] ?? [];
 }
 
 /** Días desde que se trabajó cada músculo por última vez (0 = hoy). Falta la clave si nunca. */

@@ -31,7 +31,9 @@ export function deriveWorkoutStats(data: AppData, weekStart: Date | null) {
   // Los ejercicios añadidos solo a la sesión en curso se muestran junto a los del día.
   const selectedDay = activeSession?.custom
     ? { ...baseDay, focus: activeSession.title ?? "Sesión libre", exercises: activeSession.extras ?? [] }
-    : activeSession?.extras?.length ? { ...baseDay, exercises: [...baseDay.exercises, ...activeSession.extras] } : baseDay;
+    : activeSession?.extras?.length || activeSession?.hidden?.length
+      ? { ...baseDay, exercises: [...baseDay.exercises.filter((exercise) => !activeSession.hidden?.includes(exercise.id)), ...(activeSession.extras ?? [])] }
+      : baseDay;
   const newestFirst = [...data.sessions].reverse();
   const [lastDaySession, previousDaySession] = newestFirst.filter((session) => session.dayIndex === data.selectedDay && !session.custom);
 

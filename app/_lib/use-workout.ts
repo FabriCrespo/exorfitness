@@ -148,6 +148,32 @@ export function useWorkout() {
     }));
   };
 
+  /** Cambia un ejercicio por otro parecido. `persist` lo cambia también en la rutina del día. */
+  const replaceExercise = (oldId: string, next: RoutineExercise, persist: boolean) => {
+    const entry = { exerciseId: next.id, sets: buildSets(next) };
+    setData((current) => {
+      const session = current.activeSession?.dayIndex === current.selectedDay ? current.activeSession : null;
+      if (!session || next.id === oldId) return current;
+      const day = current.days[current.selectedDay];
+      const duplicate = day.exercises.some((item) => item.id === next.id) || session.extras?.some((item) => item.id === next.id);
+      if (duplicate) return current;
+      const inDay = day.exercises.some((item) => item.id === oldId);
+      const changeRoutine = persist && inDay && !session.custom;
+      return {
+        ...current,
+        days: changeRoutine
+          ? current.days.map((item, index) => (index === current.selectedDay ? { ...item, exercises: item.exercises.map((exercise) => (exercise.id === oldId ? next : exercise)) } : item))
+          : current.days,
+        activeSession: {
+          ...session,
+          exercises: session.exercises.map((exercise) => (exercise.exerciseId === oldId ? entry : exercise)),
+          extras: changeRoutine ? session.extras : [...(session.extras ?? []).filter((item) => item.id !== oldId), next],
+          hidden: inDay && !changeRoutine ? [...(session.hidden ?? []), oldId] : session.hidden,
+        },
+      };
+    });
+  };
+
   /** Sesión libre con los ejercicios elegidos en el mapa muscular. */
   const startCustomWorkout = (exercises: RoutineExercise[], title: string) => {
     if (data.activeSession || exercises.length === 0) return;
@@ -313,7 +339,7 @@ export function useWorkout() {
   return {
     data, theme, hydrated, weekStart, storageMessage,
     toggleTheme, selectDay, addExercise, removeExercise,
-    startWorkout, updateSet, addSet, setNotes, completeExercise, setExtraCardio, startCustomWorkout, finishWorkout, updateSession, deleteSession, cancelWorkout,
+    startWorkout, updateSet, addSet, setNotes, completeExercise, replaceExercise, setExtraCardio, startCustomWorkout, finishWorkout, updateSession, deleteSession, cancelWorkout,
     addMeasurement, exportData, importData,
   };
 }

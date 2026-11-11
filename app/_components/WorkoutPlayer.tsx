@@ -3,12 +3,15 @@
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 import type { ActiveExercise, LoggedExercise, RoutineExercise, SetEntry, WorkoutSession } from "../_lib/types";
+import { musclesOf } from "../_lib/muscles";
 import { suggestSets } from "../_lib/suggestions";
 import { restSecondsFor, useElapsed } from "../_lib/use-elapsed";
 import { daysAgo, formatDate, formatNumber, volumeOf } from "../_lib/workout-data";
 import CardioProtocol from "./CardioProtocol";
 import ExerciseTrendChart from "./ExerciseTrendChart";
 import RestTimer from "./RestTimer";
+import SimilarDialog from "./SimilarDialog";
+import type { SimilarItem } from "../_lib/similar";
 import ScreenHeader from "./ScreenHeader";
 
 const ExerciseModel3D = dynamic(() => import("./ExerciseModel3D"), { ssr: false, loading: () => <div className="exercise-model-3d" /> });
@@ -22,6 +25,9 @@ type Props = {
   startedAt: string;
   doneCount: number;
   previous?: LoggedExercise;
+  similar: SimilarItem[];
+  canChangeRoutine: boolean;
+  onReplace: (next: RoutineExercise, persist: boolean) => void;
   previousWorkout?: WorkoutSession;
   sessions: WorkoutSession[];
   onBack: () => void;
@@ -59,9 +65,10 @@ function Stepper({ label, value, unit, step, min = 0, onChange }: StepperProps) 
 const describeSet = (set: SetEntry, isTimed: boolean) =>
   isTimed ? `${set.durationMinutes || 0} min` : `${set.weightKg || 0} kg × ${set.reps || 0}`;
 
-export default function WorkoutPlayer({ exercise, activeExercise, index, total, isLastExercise, startedAt, doneCount, previous, previousWorkout, sessions, onBack, onUpdateSet, onSaveSet, onAddSet, onSetNotes, onNext, onRemove }: Props) {
+export default function WorkoutPlayer({ exercise, activeExercise, index, total, isLastExercise, startedAt, doneCount, previous, similar, canChangeRoutine, onReplace, previousWorkout, sessions, onBack, onUpdateSet, onSaveSet, onAddSet, onSetNotes, onNext, onRemove }: Props) {
   const [tab, setTab] = useState<PlayerTab>("set");
   const [restSeconds, setRestSeconds] = useState<number | null>(null);
+  const [showSimilar, setShowSimilar] = useState(false);
   const elapsed = useElapsed(startedAt);
   const endRest = useCallback(() => setRestSeconds(null), []);
   const isTimed = exercise.trackingMode === "minutes";
@@ -90,7 +97,7 @@ export default function WorkoutPlayer({ exercise, activeExercise, index, total, 
         <span style={{ width: `${(doneCount / Math.max(1, total)) * 100}%` }} />
       </div>
 
-      <ExerciseModel3D exerciseId={exercise.id} label={exercise.name} />
+      <ExerciseModel3D exerciseId={exercise.id} label={exercise.name} muscles={musclesOf(exercise)} interactive />
 
       <div className="segmented" role="tablist" aria-label="Secciones del ejercicio">
         {([["set", "Serie"], ["technique", "Técnica"], ["notes", "Notas"]] as const).map(([id, label]) => (
@@ -171,6 +178,7 @@ export default function WorkoutPlayer({ exercise, activeExercise, index, total, 
           )}
 
           {!isTimed && <button className="text-button block" onClick={onAddSet}>+ Añadir una serie extra</button>}
+          {!isTimed && <button className="text-button block" onClick={() => setShowSimilar(true)}>¿Ocupado o no te convence? Ver similares</button>}
 
           {previousWorkout && previousSummary && (
             <p className="footnote">
@@ -191,6 +199,7 @@ export default function WorkoutPlayer({ exercise, activeExercise, index, total, 
             <li><span>Objetivo</span><b>{isTimed ? exercise.targetReps : `${exercise.targetSets} × ${exercise.targetReps}`}</b></li>
             <li><span>Esfuerzo</span><b>2–3 repeticiones en reserva</b></li>
           </ul>
+          {!isTimed && <button className="text-button block" onClick={() => setShowSimilar(true)}>Cambiar por un ejercicio similar</button>}
           <button className="text-button block danger" onClick={onRemove}>Quitar de la rutina</button>
         </section>
       )}
@@ -199,6 +208,17 @@ export default function WorkoutPlayer({ exercise, activeExercise, index, total, 
         <section className="list-section" aria-label="Notas">
           <textarea className="notes-field" rows={5} value={activeExercise.notes ?? ""} onChange={(event) => onSetNotes(event.target.value)} placeholder="Cómo te sentiste, qué subir la próxima vez…" aria-label="Notas del ejercicio" />
         </section>
+      )}
+      {showSimilar && (
+        <SimilarDialog
+          current={exercise}
+          items={similar}
+          sessions={sessions}
+          hasDoneSets={finished.length > 0}
+          canChangeRoutine={canChangeRoutine}
+          onPick={onReplace}
+          onClose={() => setShowSimilar(false)}
+        />
       )}
     </article>
   );

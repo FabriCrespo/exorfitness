@@ -41,3 +41,40 @@ export const EXERCISE_GEAR: Record<string, Gear> = {
   "reverse-pec-deck": { frame: "seat", hold: "handle" },
   elliptical: { frame: "elliptical", hold: "handle" },
 };
+
+/** Ejercicios del catálogo que se demuestran con el movimiento de uno parecido (la demostración es aproximada). */
+const DEMO_ALIAS: Record<string, string> = {
+  "glute-bridge": "hip-thrust",
+  "sumo-deadlift": "romanian-deadlift",
+  "lying-leg-curl": "leg-curl",
+  "hack-squat": "leg-press",
+  "cable-hip-abduction": "glute-kickback",
+  "machine-row": "seated-row",
+  "t-bar-row": "seated-row",
+  "close-grip-pulldown": "lat-pulldown",
+  "straight-arm-pulldown": "cable-pullover",
+  "dumbbell-row": "chest-supported-row",
+  "dumbbell-bench-press": "chest-press",
+  "incline-dumbbell-press": "chest-press",
+  "arnold-press": "shoulder-press",
+  "front-raise": "lateral-raise",
+  "cable-lateral-raise": "lateral-raise",
+  "rear-delt-fly": "reverse-pec-deck",
+  "hammer-curl": "bicep-curl",
+  "cable-curl": "bicep-curl",
+  "preacher-curl": "bicep-curl",
+  "overhead-triceps": "triceps-pushdown",
+  "cable-crunch": "ab-machine",
+};
+
+/** Id con el que se dibuja el 3D de un ejercicio y si es el movimiento exacto. Null si no hay demostración. */
+export function demoFor(exerciseId: string, motions: Record<string, unknown>) {
+  if (motions[exerciseId]) return { id: exerciseId, exact: true };
+  const alias = DEMO_ALIAS[exerciseId];
+  return alias && motions[alias] ? { id: alias, exact: false } : null;
+}
+
+/** Máquinas de la sala (asiento con pila, polea, prensa, elíptica): todas son Technogym en el gimnasio de Fabricio. */
+export function isTechnogym(gear: Gear) {
+  return Boolean(gear.tower || (gear.frame && ["seat", "legpress", "pullup", "elliptical"].includes(gear.frame)));
+}

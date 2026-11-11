@@ -5,6 +5,7 @@ import { agoLabel, exercisesFor, lastWorked, type MuscleId, MUSCLES, muscleLabel
 import type { AppData, RoutineExercise } from "../_lib/types";
 import { daysAgo, formatNumber } from "../_lib/workout-data";
 import BodyMap, { type BodyView } from "./BodyMap";
+import ExerciseSheet from "./ExerciseSheet";
 
 type Props = {
   data: AppData;
@@ -17,14 +18,12 @@ const MAX_DEFAULT = 6;
 export default function BodyScreen({ data, library, onStartCustom }: Props) {
   const [view, setView] = useState<BodyView>("front");
   const [selected, setSelected] = useState<Set<MuscleId>>(new Set());
-  const [skipped, setSkipped] = useState<Set<string>>(new Set());
+  const [open, setOpen] = useState<RoutineExercise | null>(null);
   const worked = useMemo(() => lastWorked(data.sessions), [data.sessions]);
   const matches = useMemo(() => exercisesFor(library, selected), [library, selected]);
   const hasActive = Boolean(data.activeSession);
 
-  // Por defecto entran los mejores ejercicios; puedes quitar o añadir los demás.
-  const isChosen = (id: string, index: number) => (skipped.has(id) ? false : index < MAX_DEFAULT || skipped.has(`+${id}`));
-  const chosen = matches.filter((item, index) => isChosen(item.exercise.id, index));
+  const chosen = matches.slice(0, MAX_DEFAULT);
 
   const toggleMuscle = (id: MuscleId) => {
     setSelected((current) => {
@@ -32,15 +31,7 @@ export default function BodyScreen({ data, library, onStartCustom }: Props) {
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
-    setSkipped(new Set());
   };
-
-  const toggleExercise = (id: string, index: number) =>
-    setSkipped((current) => {
-      const next = new Set(current);
-      if (isChosen(id, index)) { next.add(id); next.delete(`+${id}`); } else { next.delete(id); next.add(`+${id}`); }
-      return next;
-    });
 
   const lastTime = (exerciseId: string) => {
     for (const session of [...data.sessions].reverse()) {
@@ -50,7 +41,7 @@ export default function BodyScreen({ data, library, onStartCustom }: Props) {
         return `${formatNumber(top.weightKg, 1)} kg × ${top.reps} · ${agoLabel(daysAgo(session.finishedAt))}`;
       }
     }
-    return "Aún sin registro";
+    return null;
   };
 
   const titleFor = () => `Sesión libre · ${[...selected].slice(0, 3).map(muscleLabel).join(", ")}${selected.size > 3 ? "…" : ""}`;
@@ -58,7 +49,7 @@ export default function BodyScreen({ data, library, onStartCustom }: Props) {
   return (
     <article className="page-content body-screen" aria-labelledby="page-title">
       <header className="content-heading">
-        <hgroup><p className="date-line">QUÉ PUEDO TRABAJAR</p><h1 id="page-title">Cuerpo</h1></hgroup>
+        <hgroup><p className="date-line">EXPLORA POR MÚSCULO</p><h1 id="page-title">Cuerpo</h1></hgroup>
       </header>
 
       <section className="card body-card" aria-label="Mapa muscular">
@@ -87,41 +78,37 @@ export default function BodyScreen({ data, library, onStartCustom }: Props) {
       </section>
 
       <section aria-labelledby="match-title" className="body-match">
-        <h2 id="match-title" className="list-title">Ejercicios para esto</h2>
+        <h2 id="match-title" className="list-title">Qué puedes hacer</h2>
         {selected.size === 0 ? (
           <p className="empty-state">Toca un músculo en el cuerpo o en la lista para ver qué ejercicios lo trabajan.</p>
         ) : matches.length === 0 ? (
           <p className="empty-state">Aún no tienes ejercicios para esos músculos. Puedes añadir uno desde la rutina.</p>
         ) : (
           <ol className="grouped-list match-list">
-            {matches.map(({ exercise, muscles }, index) => (
+            {matches.map(({ exercise, muscles }) => (
               <li key={exercise.id}>
-                <label className="match-row">
-                  <input type="checkbox" checked={isChosen(exercise.id, index)} onChange={() => toggleExercise(exercise.id, index)} />
+                <button type="button" className="match-row" onClick={() => setOpen(exercise)}>
                   <span className="match-copy">
                     <strong>{exercise.name}</strong>
+                    <small>{exercise.equipment}</small>
                     <small>{muscles.map(muscleLabel).join(" · ")}</small>
-                    <small>Última vez · {lastTime(exercise.id)}</small>
+                    <small>{lastTime(exercise.id) ? `Última vez · ${lastTime(exercise.id)}` : "Sin registro aún"}</small>
                   </span>
-                </label>
+                  <i aria-hidden="true">›</i>
+                </button>
               </li>
             ))}
           </ol>
         )}
       </section>
 
-      {selected.size > 0 && chosen.length > 0 && (
-        <footer className="action-bar">
-          {hasActive ? (
-            <p className="action-summary"><span>Hay una sesión abierta</span><strong>Termínala para armar otra</strong></p>
-          ) : (
-            <>
-              <p className="action-summary"><span>Sesión libre</span><strong>{chosen.length} {chosen.length === 1 ? "ejercicio" : "ejercicios"}</strong></p>
-              <button className="primary-button" onClick={() => onStartCustom(chosen.map((item) => item.exercise), titleFor())}>Entrenar esto</button>
-            </>
-          )}
-        </footer>
+      {selected.size > 0 && chosen.length > 0 && !hasActive && (
+        <button className="text-button block" onClick={() => onStartCustom(chosen.map((item) => item.exercise), titleFor())}>
+          Armar una sesión con estos ejercicios ({chosen.length})
+        </button>
       )}
+
+      {open && <ExerciseSheet exercise={open} last={lastTime(open.id)} onClose={() => setOpen(null)} />}
     </article>
   );
 }

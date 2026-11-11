@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { ActiveExercise, AppData, SetEntry } from "../_lib/types";
+import { exercisePool, similarExercises } from "../_lib/similar";
+import type { ActiveExercise, AppData, RoutineExercise, SetEntry } from "../_lib/types";
 import type { WorkoutStats } from "../_lib/workout-stats";
 import { DAY_ACCENTS, estimateMinutes, formatNumber } from "../_lib/workout-data";
 import RoutineExerciseRow from "./RoutineExerciseRow";
@@ -23,6 +24,7 @@ type Props = {
   onSetNotes: (exerciseId: string, notes: string) => void;
   onCompleteExercise: (exerciseId: string) => void;
   onSetExtraCardio: (minutes: string) => void;
+  onReplaceExercise: (oldId: string, next: RoutineExercise, persist: boolean) => void;
 };
 
 const isExerciseDone = (exercise?: ActiveExercise) =>
@@ -33,7 +35,7 @@ const todayKey = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 };
 
-export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onSetNotes, onCompleteExercise, onSetExtraCardio }: Props) {
+export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRemoveExercise, onStart, onFinish, onCancel, onUpdateSet, onAddSet, onSetNotes, onCompleteExercise, onSetExtraCardio, onReplaceExercise }: Props) {
   const { selectedDay, activeSession, isCardioDay, newestFirst } = stats;
   const exercises = selectedDay.exercises;
   const total = exercises.length;
@@ -105,6 +107,9 @@ export default function RoutineScreen({ data, stats, onBack, onAddExercise, onRe
         startedAt={activeSession.startedAt}
         doneCount={activeSession.exercises.filter(isExerciseDone).length}
         previous={exercise}
+        similar={similarExercises(openDefinition, exercisePool(data.days), new Set([...exercises.map((item) => item.id), ...(activeSession.extras ?? []).map((item) => item.id)]))}
+        canChangeRoutine={!activeSession.custom}
+        onReplace={(next, persist) => { onReplaceExercise(openDefinition.id, next, persist); setOpenId(next.id); }}
         previousWorkout={workout}
         sessions={data.sessions}
         onBack={() => setOpenId(null)}

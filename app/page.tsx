@@ -61,6 +61,7 @@ export default function Home() {
             onAddSet={workout.addSet}
             onSetNotes={workout.setNotes}
             onCompleteExercise={workout.completeExercise}
+            onReplaceExercise={workout.replaceExercise}
             onSetExtraCardio={workout.setExtraCardio}
           />
         )}

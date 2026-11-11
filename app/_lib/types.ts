@@ -21,7 +21,7 @@ export type RoutineDay = {
 
 export type SetEntry = { id: string; weightKg: string; reps: string; durationMinutes?: string; complete: boolean; toFailure: boolean };
 export type ActiveExercise = { exerciseId: string; sets: SetEntry[]; notes?: string; done?: boolean };
-export type ActiveSession = { id: string; dayIndex: number; startedAt: string; exercises: ActiveExercise[]; extraCardioMinutes?: string; date?: string; extras?: RoutineExercise[]; custom?: boolean; title?: string };
+export type ActiveSession = { id: string; dayIndex: number; startedAt: string; exercises: ActiveExercise[]; extraCardioMinutes?: string; date?: string; extras?: RoutineExercise[]; custom?: boolean; title?: string; hidden?: string[] };
 export type LoggedSet = { weightKg: number; reps: number; durationMinutes?: number; toFailure: boolean };
 export type LoggedExercise = { exerciseId: string; name: string; group: Group; sets: LoggedSet[]; notes?: string };
 export type WorkoutSession = {
